@@ -1,0 +1,1515 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Link Shortener — Acesso Restrito</title>
+<meta name="robots" content="noindex, nofollow, noarchive">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="favicon.png">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600;700&family=Geist:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --bg-elev: #131313;
+    --bg-card: #161616;
+    --bg-hover: #1c1c1c;
+    --border: #262626;
+    --border-soft: #1f1f1f;
+    --text: #f5f5f5;
+    --text-soft: #a3a3a3;
+    --text-muted: #525252;
+    --accent: #8b5cf6;
+    --accent-soft: rgba(139,92,246,0.1);
+    --accent-2: #ec4899;
+    --gold: #fbbf24;
+    --green: #22c55e;
+    --blue: #3b82f6;
+    --red: #ef4444;
+  }
+  [data-theme="light"] {
+    --bg: #fafaf7;
+    --bg-elev: #ffffff;
+    --bg-card: #ffffff;
+    --bg-hover: #f5f3ee;
+    --border: #e7e5e0;
+    --border-soft: #f0ede7;
+    --text: #0a0a0a;
+    --text-soft: #525252;
+    --text-muted: #a3a3a3;
+    --accent: #7c3aed;
+    --accent-soft: rgba(124,58,237,0.08);
+    --accent-2: #db2777;
+    --gold: #d97706;
+    --green: #16a34a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Geist', sans-serif;
+    line-height: 1.5;
+    min-height: 100vh;
+    overflow-x: hidden;
+    transition: background 0.3s, color 0.3s;
+  }
+
+  /* ============ LOCK SCREEN ============ */
+  .lock-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: var(--bg);
+    overflow: hidden;
+  }
+  .lock-screen.hidden {
+    display: none;
+  }
+
+  /* Animated mesh background */
+  .lock-bg {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+  }
+  .lock-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(100px);
+    animation: orbFloat 25s infinite ease-in-out;
+  }
+  .orb-a {
+    width: 600px; height: 600px;
+    background: var(--accent);
+    top: -200px; left: -200px;
+    opacity: 0.35;
+  }
+  .orb-b {
+    width: 500px; height: 500px;
+    background: var(--accent-2);
+    bottom: -150px; right: -150px;
+    opacity: 0.3;
+    animation-delay: -8s;
+  }
+  .orb-c {
+    width: 400px; height: 400px;
+    background: var(--blue);
+    top: 40%; left: 50%;
+    opacity: 0.2;
+    animation-delay: -15s;
+  }
+  [data-theme="light"] .lock-orb { opacity: 0.15; }
+
+  @keyframes orbFloat {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(100px, -80px) scale(1.15); }
+    66% { transform: translate(-60px, 40px) scale(0.92); }
+  }
+
+  /* Grid pattern */
+  .lock-screen::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px);
+    background-size: 32px 32px;
+    pointer-events: none;
+  }
+  [data-theme="light"] .lock-screen::before {
+    background-image:
+      linear-gradient(rgba(0,0,0,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,0,0,0.025) 1px, transparent 1px);
+  }
+
+  .lock-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 48px 40px;
+    width: 100%;
+    max-width: 440px;
+    position: relative;
+    z-index: 2;
+    backdrop-filter: blur(20px);
+    box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+    animation: lockSlide 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  @keyframes lockSlide {
+    from { opacity: 0; transform: translateY(30px) scale(0.95); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  .lock-icon-wrap {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 24px;
+  }
+  .lock-icon {
+    width: 72px; height: 72px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    box-shadow: 0 12px 32px rgba(139,92,246,0.4);
+    position: relative;
+  }
+  .lock-icon::before {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    border-radius: 22px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    z-index: -1;
+    opacity: 0.4;
+    filter: blur(20px);
+  }
+
+  .lock-tag {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--accent);
+    margin-bottom: 16px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: 600;
+  }
+  .lock-tag .pulse {
+    width: 6px; height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--accent);
+    animation: pulseDot 1.5s infinite;
+  }
+  @keyframes pulseDot {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  .lock-card h1 {
+    font-family: 'Geist', sans-serif;
+    font-size: 1.7rem;
+    font-weight: 800;
+    text-align: center;
+    margin-bottom: 8px;
+    letter-spacing: -0.02em;
+  }
+  .lock-card h1 em {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-weight: 400;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .lock-subtitle {
+    text-align: center;
+    color: var(--text-soft);
+    font-size: 0.92rem;
+    margin-bottom: 32px;
+  }
+
+  .lock-field {
+    margin-bottom: 16px;
+    position: relative;
+  }
+  .lock-input {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 14px 16px 14px 44px;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-family: inherit;
+    outline: none;
+    transition: all 0.2s;
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 4px;
+  }
+  .lock-input::placeholder { letter-spacing: normal; }
+  .lock-input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+  }
+  .lock-input-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    pointer-events: none;
+  }
+
+  .lock-btn {
+    width: 100%;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    color: white;
+    border: none;
+    padding: 14px;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .lock-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 30px rgba(139,92,246,0.5);
+  }
+  .lock-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .lock-status {
+    margin-top: 12px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    text-align: center;
+    display: none;
+  }
+  .lock-status.show { display: block; animation: shake 0.4s; }
+  .lock-status.error {
+    background: rgba(239,68,68,0.1);
+    border: 1px solid var(--red);
+    color: var(--red);
+  }
+
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-6px); }
+    40%, 80% { transform: translateX(6px); }
+  }
+
+  .lock-hint {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+  }
+  .lock-hint code {
+    font-family: 'JetBrains Mono', monospace;
+    background: var(--bg);
+    padding: 2px 8px;
+    border-radius: 4px;
+    color: var(--accent);
+  }
+
+  /* ============ MAIN APP ============ */
+  .app {
+    display: none;
+    min-height: 100vh;
+  }
+  .app.active { display: block; }
+
+  /* TOPBAR */
+  .topbar {
+    background: var(--bg-elev);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    backdrop-filter: blur(20px);
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .brand-mark {
+    width: 38px; height: 38px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.2rem;
+    box-shadow: 0 4px 14px rgba(139,92,246,0.4);
+  }
+  .brand-info {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.1;
+  }
+  .brand-name {
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    font-size: 1rem;
+  }
+  .brand-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--accent);
+    margin-top: 3px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .brand-tag .dot {
+    width: 5px; height: 5px;
+    background: var(--green);
+    border-radius: 50%;
+    box-shadow: 0 0 6px var(--green);
+  }
+
+  .topbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .icon-btn {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    color: var(--text);
+    width: 38px; height: 38px;
+    border-radius: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.95rem;
+    transition: all 0.2s;
+  }
+  .icon-btn:hover { border-color: var(--accent); }
+
+  /* CONTAINER */
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 40px 24px;
+  }
+
+  /* HERO */
+  .hero {
+    margin-bottom: 40px;
+    text-align: center;
+    position: relative;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -40px; left: 50%;
+    transform: translateX(-50%);
+    width: 500px; height: 200px;
+    background: radial-gradient(ellipse, var(--accent-soft) 0%, transparent 70%);
+    z-index: -1;
+  }
+
+  .hero-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    padding: 6px 14px;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    color: var(--text-soft);
+    margin-bottom: 20px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .hero-tag .dot {
+    width: 6px; height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--accent);
+  }
+
+  .hero h1 {
+    font-family: 'Geist', sans-serif;
+    font-size: clamp(2rem, 5vw, 3.4rem);
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    margin-bottom: 16px;
+  }
+  .hero h1 em {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-weight: 400;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .hero-sub {
+    color: var(--text-soft);
+    font-size: 1rem;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+
+  /* SHORTENER FORM */
+  .shortener {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 32px;
+    margin-bottom: 32px;
+    position: relative;
+    overflow: hidden;
+  }
+  .shortener::before {
+    content: '';
+    position: absolute;
+    top: -100px; right: -100px;
+    width: 250px; height: 250px;
+    background: radial-gradient(circle, var(--accent-soft) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .form-group {
+    margin-bottom: 16px;
+    position: relative;
+    z-index: 1;
+  }
+  .form-label {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--text-soft);
+    margin-bottom: 8px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+  }
+
+  .url-input-wrap {
+    position: relative;
+  }
+  .url-input {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 16px 18px 16px 50px;
+    border-radius: 14px;
+    font-size: 1rem;
+    font-family: 'JetBrains Mono', monospace;
+    outline: none;
+    transition: all 0.2s;
+  }
+  .url-input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+  }
+  .url-icon {
+    position: absolute;
+    left: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    font-size: 1.1rem;
+    pointer-events: none;
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  @media (max-width: 600px) {
+    .form-row { grid-template-columns: 1fr; }
+  }
+
+  .small-input {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 12px 14px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-family: 'JetBrains Mono', monospace;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .small-input:focus { border-color: var(--accent); }
+
+  .small-input.with-prefix {
+    padding-left: 100px;
+  }
+  .input-prefix-wrap {
+    position: relative;
+  }
+  .input-prefix {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--accent);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    pointer-events: none;
+    font-weight: 600;
+  }
+
+  .options-toggle {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin: 16px 0;
+  }
+  .toggle-pill {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    padding: 8px 14px;
+    border-radius: 50px;
+    font-size: 0.82rem;
+    cursor: pointer;
+    color: var(--text-soft);
+    transition: all 0.2s;
+  }
+  .toggle-pill:hover {
+    border-color: var(--accent);
+    color: var(--text);
+  }
+  .toggle-pill.active {
+    background: var(--accent-soft);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .shorten-btn {
+    width: 100%;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    color: white;
+    border: none;
+    padding: 16px;
+    border-radius: 14px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    position: relative;
+    z-index: 1;
+  }
+  .shorten-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 12px 30px rgba(139,92,246,0.5);
+  }
+  .shorten-btn:active { transform: translateY(0); }
+
+  /* RESULT */
+  .result-box {
+    background: linear-gradient(135deg, var(--accent-soft), rgba(236,72,153,0.08));
+    border: 1px solid var(--accent);
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 32px;
+    display: none;
+    animation: slideDown 0.4s ease;
+  }
+  .result-box.show { display: block; }
+  @keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .result-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .result-icon {
+    width: 32px; height: 32px;
+    background: var(--green);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 0.9rem;
+  }
+  .result-title {
+    font-weight: 700;
+    font-size: 1rem;
+  }
+
+  .result-link-wrap {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+  }
+  .result-link {
+    flex: 1;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--accent);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .result-actions {
+    display: flex;
+    gap: 6px;
+  }
+  .result-action-btn {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    color: var(--text);
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    font-size: 0.95rem;
+  }
+  .result-action-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* STATS */
+  .stats-bar {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+  .stat-mini {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 18px 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .stat-mini-label {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .stat-mini-value {
+    font-family: 'Geist', sans-serif;
+    font-size: 1.6rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+  .stat-mini-trend {
+    font-size: 0.75rem;
+    color: var(--green);
+    margin-top: 6px;
+  }
+
+  /* LINKS LIST */
+  .links-section {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
+  .links-header {
+    padding: 18px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .links-title {
+    font-weight: 700;
+    font-size: 1.05rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .links-count {
+    background: var(--accent-soft);
+    color: var(--accent);
+    font-size: 0.72rem;
+    padding: 3px 10px;
+    border-radius: 50px;
+    font-weight: 600;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .search-mini {
+    flex: 1;
+    max-width: 280px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 8px 14px 8px 34px;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    font-family: inherit;
+    outline: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23a3a3a3' stroke-width='2' stroke-linecap='round'><circle cx='11' cy='11' r='8'/><path d='m21 21-4.3-4.3'/></svg>");
+    background-repeat: no-repeat;
+    background-position: 12px center;
+    transition: border-color 0.2s;
+  }
+  .search-mini:focus { border-color: var(--accent); }
+
+  .link-item {
+    padding: 18px 24px;
+    border-bottom: 1px solid var(--border-soft);
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 20px;
+    align-items: center;
+    transition: background 0.2s;
+  }
+  .link-item:last-child { border-bottom: none; }
+  .link-item:hover { background: var(--bg-hover); }
+
+  @media (max-width: 800px) {
+    .link-item {
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+    }
+    .link-clicks { display: none; }
+  }
+
+  .link-info { min-width: 0; }
+  .link-short {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--accent);
+    font-weight: 600;
+    font-size: 0.95rem;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .link-short .arrow {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+  }
+  .link-original {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .link-meta {
+    display: flex;
+    gap: 10px;
+    margin-top: 6px;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+  }
+  .link-tag {
+    background: var(--bg);
+    padding: 2px 8px;
+    border-radius: 50px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+  }
+
+  .link-clicks {
+    text-align: center;
+  }
+  .link-clicks-num {
+    font-family: 'Geist', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .link-clicks-label {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 2px;
+  }
+
+  .link-actions {
+    display: flex;
+    gap: 4px;
+  }
+  .link-action-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-soft);
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    font-size: 0.85rem;
+  }
+  .link-action-btn:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--bg-card);
+    border: 1px solid var(--green);
+    color: var(--text);
+    padding: 12px 18px;
+    border-radius: 12px;
+    font-size: 0.88rem;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.4);
+    z-index: 1001;
+    display: none;
+    align-items: center;
+    gap: 8px;
+  }
+  .toast.show {
+    display: flex;
+    animation: toastIn 0.3s ease;
+  }
+  @keyframes toastIn {
+    from { transform: translateY(100%); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+  /* QR Modal */
+  .qr-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(8px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 24px;
+  }
+  .qr-modal.show {
+    display: flex;
+    animation: fadeIn 0.2s ease;
+  }
+  @keyframes fadeIn { from {opacity:0;} to {opacity:1;} }
+
+  .qr-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 32px;
+    max-width: 360px;
+    width: 100%;
+    text-align: center;
+  }
+  .qr-card h3 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .qr-card p {
+    font-size: 0.85rem;
+    color: var(--text-soft);
+    margin-bottom: 20px;
+  }
+  .qr-img {
+    width: 220px; height: 220px;
+    margin: 0 auto 20px;
+    background: white;
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .qr-img img { width: 100%; height: 100%; }
+  .qr-close {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 10px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.88rem;
+    transition: all 0.2s;
+  }
+  .qr-close:hover { border-color: var(--accent); }
+</style>
+</head>
+<body>
+
+<!-- ============ LOCK SCREEN ============ -->
+<div class="lock-screen" id="lockScreen">
+  <div class="lock-bg">
+    <div class="lock-orb orb-a"></div>
+    <div class="lock-orb orb-b"></div>
+    <div class="lock-orb orb-c"></div>
+  </div>
+
+  <div class="lock-card">
+    <div class="lock-icon-wrap">
+      <div class="lock-icon">🔐</div>
+    </div>
+    <div class="lock-tag">
+      <span class="pulse"></span>
+      <span>ÁREA RESTRITA</span>
+    </div>
+    <h1>Acesso <em>privado</em></h1>
+    <p class="lock-subtitle">Esta página é protegida. Digite a chave de acesso para continuar.</p>
+
+    <form onsubmit="checkAccess(event)">
+      <div class="lock-field">
+        <span class="lock-input-icon">🔑</span>
+        <input type="password" class="lock-input" id="accessKey" placeholder="••••••••" autocomplete="off" required>
+      </div>
+
+      <button type="submit" class="lock-btn">
+        <span>Desbloquear</span>
+        <span>→</span>
+      </button>
+
+      <div class="lock-status" id="lockStatus"></div>
+    </form>
+
+    <div class="lock-hint">
+      Chave de demonstração: <code>setup2026</code>
+    </div>
+  </div>
+</div>
+
+<!-- ============ MAIN APP ============ -->
+<div class="app" id="app">
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark">🔗</div>
+      <div class="brand-info">
+        <div class="brand-name">LinkVault</div>
+        <div class="brand-tag">
+          <span class="dot"></span>
+          <span>PRIVADO · ATIVO</span>
+        </div>
+      </div>
+    </div>
+    <div class="topbar-actions">
+      <button class="icon-btn" onclick="toggleTheme()" id="themeBtn" title="Trocar tema">🌙</button>
+      <button class="icon-btn" onclick="window.location.href='admin.html'" title="Voltar ao admin">⬅</button>
+      <button class="icon-btn" onclick="lockNow()" title="Bloquear agora">🔒</button>
+    </div>
+  </header>
+
+  <div class="container">
+
+    <!-- HERO -->
+    <div class="hero">
+      <div class="hero-tag">
+        <span class="dot"></span>
+        <span>v1.0 · 47 links ativos</span>
+      </div>
+      <h1>Encurtador <em>privado</em><br>de links</h1>
+      <p class="hero-sub">Crie links curtos, personalizados e rastreáveis para seus projetos. Tudo seu, nada compartilhado.</p>
+    </div>
+
+    <!-- SHORTENER FORM -->
+    <div class="shortener">
+      <div class="form-group">
+        <label class="form-label">URL original</label>
+        <div class="url-input-wrap">
+          <span class="url-icon">🌐</span>
+          <input
+            type="url"
+            id="originalUrl"
+            class="url-input"
+            placeholder="https://exemplo.com/sua-url-muito-longa-aqui"
+            required
+          >
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Slug personalizado <span style="text-transform:none;color:var(--text-muted);font-size:0.78rem;">(opcional)</span></label>
+          <div class="input-prefix-wrap">
+            <span class="input-prefix">stp.br/</span>
+            <input
+              type="text"
+              id="customSlug"
+              class="small-input with-prefix"
+              placeholder="meu-link"
+              maxlength="20"
+            >
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Tag <span style="text-transform:none;color:var(--text-muted);font-size:0.78rem;">(opcional)</span></label>
+          <input
+            type="text"
+            id="linkTag"
+            class="small-input"
+            placeholder="amazon, mercado-livre, projeto-x..."
+            maxlength="20"
+          >
+        </div>
+      </div>
+
+      <div class="options-toggle">
+        <div class="toggle-pill" onclick="this.classList.toggle('active')">
+          <span>📊</span> <span>Rastrear cliques</span>
+        </div>
+        <div class="toggle-pill" onclick="this.classList.toggle('active')">
+          <span>📱</span> <span>Mobile/Desktop redirect</span>
+        </div>
+        <div class="toggle-pill" onclick="this.classList.toggle('active')">
+          <span>⏰</span> <span>Expirar em 30 dias</span>
+        </div>
+        <div class="toggle-pill" onclick="this.classList.toggle('active')">
+          <span>🔒</span> <span>Senha de acesso</span>
+        </div>
+      </div>
+
+      <button class="shorten-btn" onclick="shortenLink()">
+        <span>✨</span>
+        <span>Encurtar link</span>
+      </button>
+    </div>
+
+    <!-- RESULT -->
+    <div class="result-box" id="resultBox">
+      <div class="result-header">
+        <div class="result-icon">✓</div>
+        <div class="result-title">Link gerado com sucesso!</div>
+      </div>
+      <div class="result-link-wrap">
+        <div class="result-link" id="resultLink">stp.br/abc123</div>
+        <div class="result-actions">
+          <button class="result-action-btn" onclick="copyLink()" title="Copiar">📋</button>
+          <button class="result-action-btn" onclick="showQR()" title="QR Code">📱</button>
+          <button class="result-action-btn" onclick="openLink()" title="Abrir">↗</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-bar">
+      <div class="stat-mini">
+        <div class="stat-mini-label">Links totais</div>
+        <div class="stat-mini-value">47</div>
+        <div class="stat-mini-trend">↗ +3 esta semana</div>
+      </div>
+      <div class="stat-mini">
+        <div class="stat-mini-label">Cliques hoje</div>
+        <div class="stat-mini-value">128</div>
+        <div class="stat-mini-trend">↗ +24%</div>
+      </div>
+      <div class="stat-mini">
+        <div class="stat-mini-label">Cliques totais</div>
+        <div class="stat-mini-value">3.4k</div>
+        <div class="stat-mini-trend">↗ +18% mês</div>
+      </div>
+      <div class="stat-mini">
+        <div class="stat-mini-label">Taxa cliques</div>
+        <div class="stat-mini-value">72%</div>
+        <div class="stat-mini-trend">↗ +6pp</div>
+      </div>
+    </div>
+
+    <!-- LINKS LIST -->
+    <div class="links-section">
+      <div class="links-header">
+        <div class="links-title">
+          <span>🗂️ Seus links</span>
+          <span class="links-count">47 ativos</span>
+        </div>
+        <input type="text" class="search-mini" placeholder="Buscar links...">
+      </div>
+
+      <div id="linksList">
+        <div class="link-item">
+          <div class="link-info">
+            <div class="link-short">
+              <span>stp.br/cadeira-dt3</span>
+              <span class="arrow">→</span>
+            </div>
+            <div class="link-original">https://www.amazon.com.br/dp/B08XQXR2KX?tag=setupbrasil-20</div>
+            <div class="link-meta">
+              <span class="link-tag">amazon</span>
+              <span>📅 5 mai 2026</span>
+              <span>📍 Post: Cadeira gamer</span>
+            </div>
+          </div>
+          <div class="link-clicks">
+            <div class="link-clicks-num">312</div>
+            <div class="link-clicks-label">cliques</div>
+          </div>
+          <div class="link-actions">
+            <button class="link-action-btn" title="Copiar">📋</button>
+            <button class="link-action-btn" title="Stats">📊</button>
+            <button class="link-action-btn" title="Editar">✏️</button>
+          </div>
+        </div>
+
+        <div class="link-item">
+          <div class="link-info">
+            <div class="link-short">
+              <span>stp.br/teclado-keychron</span>
+              <span class="arrow">→</span>
+            </div>
+            <div class="link-original">https://www.mercadolivre.com.br/keychron-k2-pro-mecanico/p/MLB123456</div>
+            <div class="link-meta">
+              <span class="link-tag">mercado-livre</span>
+              <span>📅 6 mai 2026</span>
+              <span>📍 Post: Teclados R$400</span>
+            </div>
+          </div>
+          <div class="link-clicks">
+            <div class="link-clicks-num">156</div>
+            <div class="link-clicks-label">cliques</div>
+          </div>
+          <div class="link-actions">
+            <button class="link-action-btn" title="Copiar">📋</button>
+            <button class="link-action-btn" title="Stats">📊</button>
+            <button class="link-action-btn" title="Editar">✏️</button>
+          </div>
+        </div>
+
+        <div class="link-item">
+          <div class="link-info">
+            <div class="link-short">
+              <span>stp.br/monitor-lg-34</span>
+              <span class="arrow">→</span>
+            </div>
+            <div class="link-original">https://www.amazon.com.br/dp/B08LZYK4FX?tag=setupbrasil-20</div>
+            <div class="link-meta">
+              <span class="link-tag">amazon</span>
+              <span>📅 8 mai 2026</span>
+              <span>📍 Post: Monitores ultrawide</span>
+            </div>
+          </div>
+          <div class="link-clicks">
+            <div class="link-clicks-num">287</div>
+            <div class="link-clicks-label">cliques</div>
+          </div>
+          <div class="link-actions">
+            <button class="link-action-btn" title="Copiar">📋</button>
+            <button class="link-action-btn" title="Stats">📊</button>
+            <button class="link-action-btn" title="Editar">✏️</button>
+          </div>
+        </div>
+
+        <div class="link-item">
+          <div class="link-info">
+            <div class="link-short">
+              <span>stp.br/projeto-secreto</span>
+              <span class="arrow">→</span>
+            </div>
+            <div class="link-original">https://drive.google.com/folders/1aBcDeFgHiJkLmNoPqRsTuV...</div>
+            <div class="link-meta">
+              <span class="link-tag">projeto-x</span>
+              <span>🔒 Com senha</span>
+              <span>📅 7 mai 2026</span>
+            </div>
+          </div>
+          <div class="link-clicks">
+            <div class="link-clicks-num">12</div>
+            <div class="link-clicks-label">cliques</div>
+          </div>
+          <div class="link-actions">
+            <button class="link-action-btn" title="Copiar">📋</button>
+            <button class="link-action-btn" title="Stats">📊</button>
+            <button class="link-action-btn" title="Editar">✏️</button>
+          </div>
+        </div>
+
+        <div class="link-item">
+          <div class="link-info">
+            <div class="link-short">
+              <span>stp.br/headset-sony</span>
+              <span class="arrow">→</span>
+            </div>
+            <div class="link-original">https://www.amazon.com.br/dp/B0BZ1CPHC4?tag=setupbrasil-20</div>
+            <div class="link-meta">
+              <span class="link-tag">amazon</span>
+              <span>📅 3 mai 2026</span>
+              <span>📍 Post: Sony WH-1000XM5</span>
+            </div>
+          </div>
+          <div class="link-clicks">
+            <div class="link-clicks-num">94</div>
+            <div class="link-clicks-label">cliques</div>
+          </div>
+          <div class="link-actions">
+            <button class="link-action-btn" title="Copiar">📋</button>
+            <button class="link-action-btn" title="Stats">📊</button>
+            <button class="link-action-btn" title="Editar">✏️</button>
+          </div>
+        </div>
+
+        <div class="link-item">
+          <div class="link-info">
+            <div class="link-short">
+              <span>stp.br/mx-master</span>
+              <span class="arrow">→</span>
+            </div>
+            <div class="link-original">https://www.mercadolivre.com.br/logitech-mx-master-3s/p/MLB987654</div>
+            <div class="link-meta">
+              <span class="link-tag">mercado-livre</span>
+              <span>📅 5 mai 2026</span>
+              <span>📍 Post: Comparativo mouses</span>
+            </div>
+          </div>
+          <div class="link-clicks">
+            <div class="link-clicks-num">73</div>
+            <div class="link-clicks-label">cliques</div>
+          </div>
+          <div class="link-actions">
+            <button class="link-action-btn" title="Copiar">📋</button>
+            <button class="link-action-btn" title="Stats">📊</button>
+            <button class="link-action-btn" title="Editar">✏️</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="text-align:center; padding: 32px 0 0; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; font-size: 0.75rem;">
+      <p>🔐 Esta área é protegida e não indexada.</p>
+      <p style="margin-top: 4px;">Sessão expira automaticamente em <span id="sessionTimer">30:00</span></p>
+    </div>
+
+  </div>
+</div>
+
+<!-- QR Modal -->
+<div class="qr-modal" id="qrModal" onclick="if(event.target===this)closeQR()">
+  <div class="qr-card">
+    <h3>📱 QR Code do link</h3>
+    <p>Escaneie com o celular para abrir</p>
+    <div class="qr-img">
+      <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://stp.br/abc123" alt="QR Code">
+    </div>
+    <button class="qr-close" onclick="closeQR()">Fechar</button>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">
+  <span>✓</span>
+  <span id="toastMsg">Sucesso!</span>
+</div>
+
+<script>
+  // ===== ACCESS KEY (em produção, isso vai pro backend) =====
+  const ACCESS_KEY = 'setup2026';
+  const SESSION_DURATION = 30 * 60 * 1000; // 30 minutos
+
+  // ===== AUTH CHECK =====
+  function checkSession() {
+    try {
+      const session = JSON.parse(localStorage.getItem('linkvault_session') || 'null');
+      if (session && session.expires > Date.now()) {
+        unlock();
+        startSessionTimer(session.expires);
+        return true;
+      }
+    } catch(e) {}
+    return false;
+  }
+
+  function checkAccess(e) {
+    e.preventDefault();
+    const input = document.getElementById('accessKey').value;
+    const status = document.getElementById('lockStatus');
+
+    if (input === ACCESS_KEY) {
+      const expires = Date.now() + SESSION_DURATION;
+      try {
+        localStorage.setItem('linkvault_session', JSON.stringify({ expires }));
+      } catch(e) {}
+      unlock();
+      startSessionTimer(expires);
+    } else {
+      status.className = 'lock-status error show';
+      status.textContent = '✗ Chave incorreta. Tente novamente.';
+      document.getElementById('accessKey').value = '';
+      setTimeout(() => status.classList.remove('show'), 3000);
+    }
+  }
+
+  function unlock() {
+    document.getElementById('lockScreen').classList.add('hidden');
+    document.getElementById('app').classList.add('active');
+  }
+
+  function lockNow() {
+    try { localStorage.removeItem('linkvault_session'); } catch(e) {}
+    location.reload();
+  }
+
+  function startSessionTimer(expires) {
+    const timerEl = document.getElementById('sessionTimer');
+    if (!timerEl) return;
+
+    function update() {
+      const remaining = expires - Date.now();
+      if (remaining <= 0) {
+        lockNow();
+        return;
+      }
+      const min = Math.floor(remaining / 60000);
+      const sec = Math.floor((remaining % 60000) / 1000);
+      timerEl.textContent = `${min}:${sec.toString().padStart(2, '0')}`;
+    }
+    update();
+    setInterval(update, 1000);
+  }
+
+  // ===== THEME =====
+  function toggleTheme() {
+    const html = document.documentElement;
+    const current = html.getAttribute('data-theme');
+    const newTheme = current === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', newTheme);
+    const btn = document.getElementById('themeBtn');
+    if (btn) btn.textContent = newTheme === 'dark' ? '🌙' : '☀️';
+    try { localStorage.setItem('theme', newTheme); } catch(e) {}
+  }
+
+  try {
+    const saved = localStorage.getItem('theme');
+    if (saved) {
+      document.documentElement.setAttribute('data-theme', saved);
+    }
+  } catch(e) {}
+
+  // ===== SHORTENER =====
+  function generateSlug() {
+    const chars = 'abcdefghijkmnopqrstuvwxyz23456789';
+    let result = '';
+    for (let i = 0; i < 6; i++) {
+      result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return result;
+  }
+
+  function shortenLink() {
+    const url = document.getElementById('originalUrl').value.trim();
+    const customSlug = document.getElementById('customSlug').value.trim();
+
+    if (!url) {
+      showToast('⚠ Digite uma URL primeiro');
+      return;
+    }
+
+    try {
+      new URL(url);
+    } catch {
+      showToast('⚠ URL inválida');
+      return;
+    }
+
+    const slug = customSlug || generateSlug();
+    const shortLink = `stp.br/${slug}`;
+
+    document.getElementById('resultLink').textContent = shortLink;
+    document.getElementById('resultBox').classList.add('show');
+
+    // Update QR
+    const qrImg = document.querySelector('.qr-img img');
+    if (qrImg) {
+      qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://${shortLink}`;
+    }
+
+    // Scroll to result
+    document.getElementById('resultBox').scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+    showToast('✨ Link encurtado com sucesso!');
+  }
+
+  function copyLink() {
+    const link = document.getElementById('resultLink').textContent;
+    navigator.clipboard.writeText(`https://${link}`).then(() => {
+      showToast('📋 Copiado para a área de transferência');
+    }).catch(() => {
+      showToast('📋 Link: ' + link);
+    });
+  }
+
+  function openLink() {
+    showToast('↗ Em produção, abriria o link');
+  }
+
+  function showQR() {
+    document.getElementById('qrModal').classList.add('show');
+  }
+  function closeQR() {
+    document.getElementById('qrModal').classList.remove('show');
+  }
+
+  function showToast(msg) {
+    document.getElementById('toastMsg').textContent = msg;
+    const toast = document.getElementById('toast');
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2500);
+  }
+
+  // ===== INIT =====
+  if (!checkSession()) {
+    document.getElementById('accessKey').focus();
+  } else {
+    const btn = document.getElementById('themeBtn');
+    if (btn) {
+      const theme = document.documentElement.getAttribute('data-theme');
+      btn.textContent = theme === 'dark' ? '🌙' : '☀️';
+    }
+  }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1826 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel Admin — SetupBrasil</title>
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="favicon.png">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&family=Geist:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --bg-elev: #131313;
+    --bg-card: #161616;
+    --bg-hover: #1c1c1c;
+    --border: #262626;
+    --border-soft: #1f1f1f;
+    --text: #f5f5f5;
+    --text-soft: #a3a3a3;
+    --text-muted: #525252;
+    --accent: #ff5722;
+    --accent-soft: rgba(255,87,34,0.1);
+    --gold: #fbbf24;
+    --green: #22c55e;
+    --blue: #3b82f6;
+    --purple: #a855f7;
+    --red: #ef4444;
+  }
+  [data-theme="light"] {
+    --bg: #fafaf7;
+    --bg-elev: #ffffff;
+    --bg-card: #ffffff;
+    --bg-hover: #f5f3ee;
+    --border: #e7e5e0;
+    --border-soft: #f0ede7;
+    --text: #0a0a0a;
+    --text-soft: #525252;
+    --text-muted: #a3a3a3;
+    --accent: #ea580c;
+    --accent-soft: rgba(234,88,12,0.08);
+    --gold: #d97706;
+    --green: #16a34a;
+    --blue: #2563eb;
+    --purple: #9333ea;
+    --red: #dc2626;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Geist', sans-serif;
+    line-height: 1.5;
+    overflow-x: hidden;
+    transition: background 0.3s ease, color 0.3s ease;
+  }
+
+  /* ============ LAYOUT ============ */
+  .layout {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    min-height: 100vh;
+  }
+
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; }
+    .sidebar { display: none; }
+  }
+
+  /* ============ SIDEBAR ============ */
+  .sidebar {
+    background: var(--bg-elev);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+  }
+
+  .sidebar-logo {
+    padding: 22px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color: var(--text);
+  }
+  .sb-mark {
+    width: 36px; height: 36px;
+    background: var(--accent);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    box-shadow: 0 4px 12px rgba(255,87,34,0.3);
+    flex-shrink: 0;
+  }
+  .sb-mark svg { width: 20px; height: 20px; }
+  .sb-name {
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+  .sb-tag {
+    font-size: 0.65rem;
+    color: var(--accent);
+    margin-top: 4px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+
+  .sidebar-section {
+    padding: 16px 16px 8px;
+  }
+  .sidebar-section-label {
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--text-muted);
+    padding: 0 12px 10px;
+    font-weight: 600;
+  }
+
+  .sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    color: var(--text-soft);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    margin-bottom: 2px;
+  }
+  .sidebar-link:hover {
+    background: var(--bg-hover);
+    color: var(--text);
+  }
+  .sidebar-link.active {
+    background: var(--accent-soft);
+    color: var(--accent);
+  }
+  .sidebar-link .icon {
+    font-size: 1.1rem;
+    width: 20px;
+    text-align: center;
+  }
+  .sidebar-link .badge {
+    margin-left: auto;
+    background: var(--accent);
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 50px;
+  }
+
+  .sidebar-footer {
+    margin-top: auto;
+    padding: 16px;
+    border-top: 1px solid var(--border);
+  }
+  .user-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .user-card:hover { background: var(--bg-hover); }
+  .user-avatar {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, var(--accent), var(--gold));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: white;
+    font-size: 0.9rem;
+  }
+  .user-info { flex: 1; min-width: 0; }
+  .user-name {
+    font-size: 0.85rem;
+    font-weight: 600;
+    line-height: 1.2;
+  }
+  .user-email {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* ============ MAIN ============ */
+  .main {
+    overflow-x: hidden;
+  }
+
+  .topbar {
+    background: var(--bg-elev);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .page-title {
+    font-family: 'Geist', sans-serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  .page-title em {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-weight: 400;
+    color: var(--accent);
+  }
+
+  .topbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .icon-btn {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    color: var(--text);
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    transition: all 0.2s;
+    position: relative;
+  }
+  .icon-btn:hover {
+    border-color: var(--accent);
+  }
+  .icon-btn .notif-dot {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 8px; height: 8px;
+    background: var(--red);
+    border-radius: 50%;
+    border: 2px solid var(--bg-card);
+  }
+
+  .primary-btn {
+    background: var(--accent);
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+  }
+  .primary-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(255,87,34,0.4);
+  }
+
+  /* ============ CONTENT ============ */
+  .content {
+    padding: 32px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  /* Hide all pages by default */
+  .page { display: none; }
+  .page.active {
+    display: block;
+    animation: fadeIn 0.3s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ============ DASHBOARD ============ */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+    margin-bottom: 32px;
+  }
+
+  .stat-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 22px;
+    position: relative;
+    overflow: hidden;
+  }
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: -30px; right: -30px;
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    opacity: 0.1;
+  }
+  .stat-card.posts::before { background: var(--blue); }
+  .stat-card.views::before { background: var(--green); }
+  .stat-card.clicks::before { background: var(--accent); }
+  .stat-card.revenue::before { background: var(--gold); }
+
+  .stat-label {
+    font-size: 0.78rem;
+    color: var(--text-soft);
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .stat-icon {
+    width: 28px; height: 28px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+  }
+  .stat-card.posts .stat-icon { background: rgba(59,130,246,0.15); }
+  .stat-card.views .stat-icon { background: rgba(34,197,94,0.15); }
+  .stat-card.clicks .stat-icon { background: rgba(255,87,34,0.15); }
+  .stat-card.revenue .stat-icon { background: rgba(251,191,36,0.15); }
+
+  .stat-value {
+    font-family: 'Geist', sans-serif;
+    font-size: 2.2rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+  .stat-trend {
+    font-size: 0.8rem;
+    color: var(--green);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .stat-trend.down { color: var(--red); }
+
+  .dashboard-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 24px;
+  }
+
+  @media (max-width: 1000px) {
+    .dashboard-grid { grid-template-columns: 1fr; }
+  }
+
+  .panel {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
+  .panel-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .panel-title {
+    font-family: 'Geist', sans-serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+  .panel-link {
+    color: var(--text-soft);
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: color 0.2s;
+  }
+  .panel-link:hover { color: var(--accent); }
+
+  /* Chart placeholder */
+  .chart-area {
+    padding: 24px;
+    height: 280px;
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    gap: 12px;
+  }
+  .bar {
+    flex: 1;
+    background: linear-gradient(to top, var(--accent), rgba(255,87,34,0.4));
+    border-radius: 8px 8px 4px 4px;
+    position: relative;
+    min-height: 12%;
+    transition: all 0.3s;
+    cursor: pointer;
+  }
+  .bar:hover { background: linear-gradient(to top, var(--accent), rgba(255,87,34,0.7)); }
+  .bar::after {
+    content: attr(data-label);
+    position: absolute;
+    bottom: -22px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.72rem;
+    color: var(--text-muted);
+  }
+  .bar::before {
+    content: attr(data-value);
+    position: absolute;
+    top: -22px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--text);
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .bar:hover::before { opacity: 1; }
+
+  /* Activity list */
+  .activity-list {
+    padding: 8px;
+  }
+  .activity-item {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 12px;
+    padding: 12px;
+    border-radius: 10px;
+    align-items: center;
+    transition: background 0.2s;
+  }
+  .activity-item:hover { background: var(--bg-hover); }
+  .activity-icon {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+  }
+  .activity-icon.green { background: rgba(34,197,94,0.15); color: var(--green); }
+  .activity-icon.blue { background: rgba(59,130,246,0.15); color: var(--blue); }
+  .activity-icon.gold { background: rgba(251,191,36,0.15); color: var(--gold); }
+  .activity-icon.accent { background: rgba(255,87,34,0.15); color: var(--accent); }
+
+  .activity-text {
+    font-size: 0.85rem;
+    line-height: 1.4;
+  }
+  .activity-text strong { font-weight: 600; }
+  .activity-time {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+
+  .activity-amount {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--green);
+  }
+
+  /* ============ POSTS LIST ============ */
+  .posts-toolbar {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+
+  .search-input {
+    flex: 1;
+    min-width: 240px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 10px 16px 10px 38px;
+    border-radius: 10px;
+    font-size: 0.88rem;
+    font-family: inherit;
+    outline: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23a3a3a3' stroke-width='2' stroke-linecap='round'><circle cx='11' cy='11' r='8'/><path d='m21 21-4.3-4.3'/></svg>");
+    background-repeat: no-repeat;
+    background-position: 14px center;
+    transition: border-color 0.2s;
+  }
+  .search-input:focus { border-color: var(--accent); }
+
+  .filter-btn {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .filter-btn:hover { border-color: var(--accent); }
+
+  .posts-table {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+  .posts-table-row {
+    display: grid;
+    grid-template-columns: 60px 1fr 120px 120px 100px 100px 80px;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border-soft);
+    align-items: center;
+    gap: 16px;
+    transition: background 0.2s;
+  }
+  .posts-table-row:last-child { border-bottom: none; }
+  .posts-table-row.head {
+    background: var(--bg-elev);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text-muted);
+    font-weight: 600;
+  }
+  .posts-table-row:not(.head):hover { background: var(--bg-hover); }
+
+  @media (max-width: 900px) {
+    .posts-table-row {
+      grid-template-columns: 50px 1fr auto;
+    }
+    .posts-table-row .col-cat,
+    .posts-table-row .col-views,
+    .posts-table-row .col-status,
+    .posts-table-row .col-date { display: none; }
+  }
+
+  .post-thumb {
+    width: 44px; height: 44px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--bg-elev), var(--border));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+  }
+
+  .post-row-title {
+    font-weight: 600;
+    font-size: 0.92rem;
+    margin-bottom: 4px;
+  }
+  .post-row-excerpt {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .col-cat {
+    font-size: 0.78rem;
+    color: var(--text-soft);
+  }
+  .col-views {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    color: var(--text-soft);
+  }
+  .col-date {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+  }
+
+  .status-pill {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 50px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  .status-pill.published { background: rgba(34,197,94,0.15); color: var(--green); }
+  .status-pill.draft { background: rgba(251,191,36,0.15); color: var(--gold); }
+  .status-pill.scheduled { background: rgba(59,130,246,0.15); color: var(--blue); }
+
+  .row-actions {
+    display: flex;
+    gap: 4px;
+  }
+  .row-action-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-soft);
+    width: 30px; height: 30px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    transition: all 0.2s;
+  }
+  .row-action-btn:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+
+  /* ============ EDITOR ============ */
+  .editor-grid {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 24px;
+  }
+
+  @media (max-width: 1000px) {
+    .editor-grid { grid-template-columns: 1fr; }
+  }
+
+  .editor-main {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+  }
+
+  .editor-field {
+    margin-bottom: 20px;
+  }
+  .editor-field label {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--text-soft);
+    margin-bottom: 8px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .editor-input {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 14px 16px;
+    border-radius: 10px;
+    font-family: inherit;
+    outline: none;
+    font-size: 0.95rem;
+    transition: border-color 0.2s;
+  }
+  .editor-input:focus { border-color: var(--accent); }
+
+  .editor-input.title-input {
+    font-family: 'Geist', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    padding: 16px;
+  }
+
+  .editor-textarea {
+    min-height: 320px;
+    resize: vertical;
+    line-height: 1.7;
+    font-family: 'Geist', sans-serif;
+  }
+
+  .editor-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  /* AI Box */
+  .ai-box {
+    background: linear-gradient(135deg, rgba(168,85,247,0.08), rgba(255,87,34,0.08));
+    border: 1px solid rgba(168,85,247,0.3);
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+
+  .ai-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .ai-icon {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, var(--purple), var(--accent));
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+  }
+  .ai-title {
+    font-weight: 700;
+    font-size: 0.95rem;
+  }
+  .ai-subtitle {
+    font-size: 0.78rem;
+    color: var(--text-soft);
+  }
+
+  .ai-textarea {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 12px 14px;
+    border-radius: 10px;
+    font-family: inherit;
+    outline: none;
+    font-size: 0.88rem;
+    min-height: 80px;
+    resize: vertical;
+    margin-bottom: 12px;
+  }
+  .ai-textarea:focus { border-color: var(--purple); }
+
+  .ai-suggestions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+  }
+  .ai-chip {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text-soft);
+    padding: 6px 12px;
+    border-radius: 50px;
+    font-size: 0.78rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .ai-chip:hover {
+    border-color: var(--purple);
+    color: var(--text);
+  }
+
+  .ai-btn {
+    background: linear-gradient(135deg, var(--purple), var(--accent));
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s;
+  }
+  .ai-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(168,85,247,0.4);
+  }
+  .ai-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+
+  /* Sidebar editor */
+  .editor-side {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .side-panel {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+  }
+  .side-panel-title {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text-muted);
+    margin-bottom: 14px;
+    font-weight: 600;
+  }
+
+  .select-input {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 10px 12px;
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 0.88rem;
+    outline: none;
+    cursor: pointer;
+  }
+
+  .tag-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 10px;
+  }
+  .tag {
+    background: var(--accent-soft);
+    color: var(--accent);
+    border: 1px solid rgba(255,87,34,0.3);
+    padding: 4px 10px;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .tag-remove {
+    background: none;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    padding: 0;
+    font-size: 0.8rem;
+    opacity: 0.6;
+  }
+  .tag-remove:hover { opacity: 1; }
+
+  .side-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .side-action-btn {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 12px;
+    border-radius: 10px;
+    font-size: 0.88rem;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .side-action-btn:hover {
+    border-color: var(--accent);
+  }
+  .side-action-btn.publish {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
+  }
+  .side-action-btn.publish:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(255,87,34,0.4);
+  }
+
+  /* ============ PRODUCTS ============ */
+  .products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+  }
+  .product-card-admin {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    transition: all 0.2s;
+  }
+  .product-card-admin:hover {
+    transform: translateY(-2px);
+    border-color: var(--accent);
+  }
+  .product-img-admin {
+    aspect-ratio: 4/3;
+    background: linear-gradient(135deg, var(--bg-elev), var(--border));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+  }
+  .product-body-admin {
+    padding: 16px;
+  }
+  .product-name-admin {
+    font-weight: 600;
+    font-size: 0.95rem;
+    margin-bottom: 6px;
+  }
+  .product-price-admin {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--accent);
+    font-weight: 700;
+    font-size: 1.05rem;
+    margin-bottom: 10px;
+  }
+  .product-meta-admin {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .product-platform {
+    background: var(--bg);
+    padding: 3px 8px;
+    border-radius: 50px;
+    font-weight: 600;
+  }
+
+  /* ============ SETTINGS ============ */
+  .settings-panel {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    max-width: 800px;
+  }
+  .settings-section {
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 24px;
+    margin-bottom: 24px;
+  }
+  .settings-section:last-child { border: none; margin: 0; padding: 0; }
+  .settings-section-title {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+  }
+
+  .settings-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 14px;
+  }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 32px;
+    right: 32px;
+    background: var(--bg-card);
+    border: 1px solid var(--green);
+    color: var(--text);
+    padding: 14px 20px;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.3);
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    gap: 10px;
+  }
+  .toast.show {
+    display: flex;
+    animation: toastSlide 0.3s ease;
+  }
+  @keyframes toastSlide {
+    from { transform: translateY(100%); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+  /* Mobile menu button */
+  .menu-btn {
+    display: none;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    color: var(--text);
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+  }
+  @media (max-width: 900px) {
+    .menu-btn { display: flex; }
+  }
+</style>
+</head>
+<body>
+
+<div class="layout">
+
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="sidebar">
+    <a href="index.html" class="sidebar-logo">
+      <div class="sb-mark"><svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="6" y="10" width="36" height="22" rx="3" fill="white"/><rect x="20" y="32" width="8" height="6" fill="white"/><rect x="14" y="38" width="20" height="3" rx="1.5" fill="white"/></svg></div>
+      <div>
+        <div class="sb-name">SetupBrasil</div>
+        <div class="sb-tag">PAINEL ADMIN</div>
+      </div>
+    </a>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Geral</div>
+      <a class="sidebar-link active" data-page="dashboard" onclick="showPage('dashboard')">
+        <span class="icon">📊</span>
+        <span>Dashboard</span>
+      </a>
+      <a class="sidebar-link" data-page="posts" onclick="showPage('posts')">
+        <span class="icon">📝</span>
+        <span>Posts</span>
+        <span class="badge">12</span>
+      </a>
+      <a class="sidebar-link" data-page="editor" onclick="showPage('editor')">
+        <span class="icon">✨</span>
+        <span>Novo Post</span>
+      </a>
+      <a class="sidebar-link" data-page="products" onclick="showPage('products')">
+        <span class="icon">🛒</span>
+        <span>Produtos</span>
+      </a>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Configuração</div>
+      <a class="sidebar-link" data-page="categories" onclick="showPage('categories')">
+        <span class="icon">🏷️</span>
+        <span>Categorias</span>
+      </a>
+      <a class="sidebar-link" data-page="analytics" onclick="showPage('analytics')">
+        <span class="icon">📈</span>
+        <span>Analytics</span>
+      </a>
+      <a class="sidebar-link" data-page="settings" onclick="showPage('settings')">
+        <span class="icon">⚙️</span>
+        <span>Configurações</span>
+      </a>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="user-card" onclick="logout()">
+        <div class="user-avatar">A</div>
+        <div class="user-info">
+          <div class="user-name">Admin</div>
+          <div class="user-email">admin@setupbrasil.com</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ============ MAIN ============ -->
+  <main class="main">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <div style="display:flex; align-items:center; gap:14px;">
+        <button class="menu-btn">☰</button>
+        <h1 class="page-title" id="pageTitle">Dashboard</h1>
+      </div>
+      <div class="topbar-actions">
+        <button class="icon-btn" onclick="window.open('index.html','_blank')" title="Ver site">🌐</button>
+        <button class="icon-btn" onclick="toggleTheme()" id="themeBtn">🌙</button>
+        <button class="icon-btn" title="Notificações">
+          🔔
+          <span class="notif-dot"></span>
+        </button>
+        <button class="primary-btn" onclick="showPage('editor')">
+          <span>+</span> Novo Post
+        </button>
+      </div>
+    </header>
+
+    <div class="content">
+
+      <!-- ============ DASHBOARD PAGE ============ -->
+      <div class="page active" id="page-dashboard">
+
+        <div class="stats-grid">
+          <div class="stat-card posts">
+            <div class="stat-label">
+              <span class="stat-icon">📝</span>
+              Posts publicados
+            </div>
+            <div class="stat-value">12</div>
+            <div class="stat-trend">↗ +2 esta semana</div>
+          </div>
+          <div class="stat-card views">
+            <div class="stat-label">
+              <span class="stat-icon">👁️</span>
+              Visualizações
+            </div>
+            <div class="stat-value">12.4k</div>
+            <div class="stat-trend">↗ +18.2% vs mês passado</div>
+          </div>
+          <div class="stat-card clicks">
+            <div class="stat-label">
+              <span class="stat-icon">🖱️</span>
+              Cliques afiliado
+            </div>
+            <div class="stat-value">847</div>
+            <div class="stat-trend">↗ +24% vs mês passado</div>
+          </div>
+          <div class="stat-card revenue">
+            <div class="stat-label">
+              <span class="stat-icon">💰</span>
+              Comissões (mês)
+            </div>
+            <div class="stat-value">R$ 1.247</div>
+            <div class="stat-trend">↗ +R$ 312 vs anterior</div>
+          </div>
+        </div>
+
+        <div class="dashboard-grid">
+
+          <div class="panel">
+            <div class="panel-header">
+              <h3 class="panel-title">Visualizações nos últimos 7 dias</h3>
+              <span class="panel-link">Ver completo →</span>
+            </div>
+            <div class="chart-area">
+              <div class="bar" style="height: 45%" data-label="Sex" data-value="891"></div>
+              <div class="bar" style="height: 60%" data-label="Sáb" data-value="1.2k"></div>
+              <div class="bar" style="height: 35%" data-label="Dom" data-value="678"></div>
+              <div class="bar" style="height: 75%" data-label="Seg" data-value="1.5k"></div>
+              <div class="bar" style="height: 85%" data-label="Ter" data-value="1.7k"></div>
+              <div class="bar" style="height: 65%" data-label="Qua" data-value="1.3k"></div>
+              <div class="bar" style="height: 95%" data-label="Qui" data-value="1.9k"></div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-header">
+              <h3 class="panel-title">Atividade recente</h3>
+            </div>
+            <div class="activity-list">
+              <div class="activity-item">
+                <div class="activity-icon green">💰</div>
+                <div>
+                  <div class="activity-text"><strong>Nova comissão</strong> · Cadeira gamer</div>
+                  <div class="activity-time">há 2 horas · Amazon</div>
+                </div>
+                <div class="activity-amount">+R$ 87</div>
+              </div>
+              <div class="activity-item">
+                <div class="activity-icon blue">📝</div>
+                <div>
+                  <div class="activity-text"><strong>Post publicado</strong> · Monitores 4K</div>
+                  <div class="activity-time">há 5 horas</div>
+                </div>
+              </div>
+              <div class="activity-item">
+                <div class="activity-icon gold">⭐</div>
+                <div>
+                  <div class="activity-text"><strong>+1.2k</strong> visualizações</div>
+                  <div class="activity-time">post Keychron K2 · ontem</div>
+                </div>
+              </div>
+              <div class="activity-item">
+                <div class="activity-icon green">💰</div>
+                <div>
+                  <div class="activity-text"><strong>Nova comissão</strong> · Teclado mecânico</div>
+                  <div class="activity-time">ontem · Mercado Livre</div>
+                </div>
+                <div class="activity-amount">+R$ 42</div>
+              </div>
+              <div class="activity-item">
+                <div class="activity-icon accent">🖱️</div>
+                <div>
+                  <div class="activity-text"><strong>23 cliques</strong> em link afiliado</div>
+                  <div class="activity-time">ontem · post Mouse vertical</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ============ POSTS PAGE ============ -->
+      <div class="page" id="page-posts">
+        <div class="posts-toolbar">
+          <input type="text" class="search-input" placeholder="Buscar posts...">
+          <button class="filter-btn">📁 Categoria</button>
+          <button class="filter-btn">🏷️ Status</button>
+          <button class="primary-btn" onclick="showPage('editor')">+ Novo Post</button>
+        </div>
+
+        <div class="posts-table">
+          <div class="posts-table-row head">
+            <div></div>
+            <div>Título</div>
+            <div class="col-cat">Categoria</div>
+            <div class="col-views">Views</div>
+            <div class="col-status">Status</div>
+            <div class="col-date">Data</div>
+            <div>Ações</div>
+          </div>
+
+          <div class="posts-table-row">
+            <div class="post-thumb">🖥️</div>
+            <div>
+              <div class="post-row-title">Os 7 melhores monitores ultrawide para programadores em 2026</div>
+              <div class="post-row-excerpt">Testamos os principais modelos da LG, Samsung, Dell...</div>
+            </div>
+            <div class="col-cat">Monitores</div>
+            <div class="col-views">3.2k</div>
+            <div class="col-status"><span class="status-pill published">Publicado</span></div>
+            <div class="col-date">8 mai</div>
+            <div class="row-actions">
+              <button class="row-action-btn" title="Editar" onclick="showPage('editor')">✏️</button>
+              <button class="row-action-btn" title="Mais">⋯</button>
+            </div>
+          </div>
+
+          <div class="posts-table-row">
+            <div class="post-thumb">⌨️</div>
+            <div>
+              <div class="post-row-title">Teclado mecânico custa caro? Mostro 5 opções abaixo de R$ 400</div>
+              <div class="post-row-excerpt">5 teclados mecânicos com ótimo custo-benefício...</div>
+            </div>
+            <div class="col-cat">Periféricos</div>
+            <div class="col-views">1.8k</div>
+            <div class="col-status"><span class="status-pill published">Publicado</span></div>
+            <div class="col-date">7 mai</div>
+            <div class="row-actions">
+              <button class="row-action-btn" title="Editar">✏️</button>
+              <button class="row-action-btn" title="Mais">⋯</button>
+            </div>
+          </div>
+
+          <div class="posts-table-row">
+            <div class="post-thumb">🪑</div>
+            <div>
+              <div class="post-row-title">Cadeira gamer x ergonômica: qual realmente vale para 8h de trabalho</div>
+              <div class="post-row-excerpt">Comparativo direto entre os dois modelos...</div>
+            </div>
+            <div class="col-cat">Cadeiras</div>
+            <div class="col-views">2.4k</div>
+            <div class="col-status"><span class="status-pill published">Publicado</span></div>
+            <div class="col-date">6 mai</div>
+            <div class="row-actions">
+              <button class="row-action-btn" title="Editar">✏️</button>
+              <button class="row-action-btn" title="Mais">⋯</button>
+            </div>
+          </div>
+
+          <div class="posts-table-row">
+            <div class="post-thumb">🎧</div>
+            <div>
+              <div class="post-row-title">Sony WH-1000XM5: ainda é o rei dos headphones?</div>
+              <div class="post-row-excerpt">Comparativo direto com Bose QC Ultra...</div>
+            </div>
+            <div class="col-cat">Headsets</div>
+            <div class="col-views">947</div>
+            <div class="col-status"><span class="status-pill published">Publicado</span></div>
+            <div class="col-date">3 mai</div>
+            <div class="row-actions">
+              <button class="row-action-btn" title="Editar">✏️</button>
+              <button class="row-action-btn" title="Mais">⋯</button>
+            </div>
+          </div>
+
+          <div class="posts-table-row">
+            <div class="post-thumb">💡</div>
+            <div>
+              <div class="post-row-title">Setup com luz: as melhores luminárias de mesa</div>
+              <div class="post-row-excerpt">Da Xiaomi até a BenQ ScreenBar...</div>
+            </div>
+            <div class="col-cat">Iluminação</div>
+            <div class="col-views">0</div>
+            <div class="col-status"><span class="status-pill draft">Rascunho</span></div>
+            <div class="col-date">2 mai</div>
+            <div class="row-actions">
+              <button class="row-action-btn" title="Editar">✏️</button>
+              <button class="row-action-btn" title="Mais">⋯</button>
+            </div>
+          </div>
+
+          <div class="posts-table-row">
+            <div class="post-thumb">🔌</div>
+            <div>
+              <div class="post-row-title">Hub USB-C: 5 modelos testados na prática</div>
+              <div class="post-row-excerpt">Quais hubs realmente entregam 4K@60Hz...</div>
+            </div>
+            <div class="col-cat">Acessórios</div>
+            <div class="col-views">0</div>
+            <div class="col-status"><span class="status-pill scheduled">Agendado</span></div>
+            <div class="col-date">10 mai</div>
+            <div class="row-actions">
+              <button class="row-action-btn" title="Editar">✏️</button>
+              <button class="row-action-btn" title="Mais">⋯</button>
+            </div>
+          </div>
+
+          <div class="posts-table-row">
+            <div class="post-thumb">🖱️</div>
+            <div>
+              <div class="post-row-title">Logitech MX Master 3S vs Razer Pro Click</div>
+              <div class="post-row-excerpt">Qual escolher entre os dois mouses premium...</div>
+            </div>
+            <div class="col-cat">Mouse</div>
+            <div class="col-views">1.1k</div>
+            <div class="col-status"><span class="status-pill published">Publicado</span></div>
+            <div class="col-date">5 mai</div>
+            <div class="row-actions">
+              <button class="row-action-btn" title="Editar">✏️</button>
+              <button class="row-action-btn" title="Mais">⋯</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ EDITOR PAGE ============ -->
+      <div class="page" id="page-editor">
+        <div class="editor-grid">
+
+          <div class="editor-main">
+            <!-- AI ASSISTANT -->
+            <div class="ai-box">
+              <div class="ai-header">
+                <div class="ai-icon">✨</div>
+                <div>
+                  <div class="ai-title">Assistente de IA</div>
+                  <div class="ai-subtitle">Descreva o que você quer escrever e a IA vai te ajudar</div>
+                </div>
+              </div>
+              <textarea class="ai-textarea" id="aiPrompt" placeholder="Ex: Escreva um review sobre o teclado Keychron K2 Pro destacando bateria, switches e custo-benefício para programadores..."></textarea>
+              <div class="ai-suggestions">
+                <button class="ai-chip" onclick="setPrompt('Review completo de produto')">📝 Review completo</button>
+                <button class="ai-chip" onclick="setPrompt('Comparativo entre 5 produtos')">⚖️ Comparativo</button>
+                <button class="ai-chip" onclick="setPrompt('Top 10 melhores')">🏆 Top 10</button>
+                <button class="ai-chip" onclick="setPrompt('Guia completo de compra')">📘 Guia</button>
+                <button class="ai-chip" onclick="setPrompt('Lista de produtos baratos')">💰 Lista barata</button>
+              </div>
+              <button class="ai-btn" onclick="generateContent()" id="aiBtn">
+                <span>✨</span> <span id="aiBtnText">Gerar conteúdo com IA</span>
+              </button>
+            </div>
+
+            <div class="editor-field">
+              <label>Título do Post</label>
+              <input type="text" class="editor-input title-input" id="postTitle" placeholder="Digite um título atrativo..." value="Os 7 melhores monitores ultrawide para programadores em 2026">
+            </div>
+
+            <div class="editor-field">
+              <label>Resumo (excerpt)</label>
+              <input type="text" class="editor-input" id="postExcerpt" placeholder="Breve resumo que aparecerá nas listagens" value="Testamos os principais modelos da LG, Samsung, Dell e Xiaomi...">
+            </div>
+
+            <div class="editor-field">
+              <label>Conteúdo</label>
+              <textarea class="editor-input editor-textarea" id="postContent" placeholder="Escreva o conteúdo do seu post aqui...">Trabalhar 8 horas por dia em frente a uma tela é coisa séria. Um monitor ruim pode causar dor de cabeça, vista cansada e até perda de produtividade.
+
+Por isso, decidimos testar os 7 melhores monitores ultrawide do mercado em 2026...</textarea>
+            </div>
+          </div>
+
+          <div class="editor-side">
+            <div class="side-panel">
+              <div class="side-panel-title">Publicação</div>
+              <div class="side-actions">
+                <button class="side-action-btn">💾 Salvar rascunho</button>
+                <button class="side-action-btn">👁️ Pré-visualizar</button>
+                <button class="side-action-btn publish" onclick="publishPost()">🚀 Publicar agora</button>
+              </div>
+            </div>
+
+            <div class="side-panel">
+              <div class="side-panel-title">Categoria</div>
+              <select class="select-input">
+                <option>Monitores</option>
+                <option>Teclados</option>
+                <option>Mouses</option>
+                <option>Cadeiras</option>
+                <option>Headsets</option>
+                <option>Notebooks</option>
+                <option>Acessórios</option>
+                <option>Iluminação</option>
+              </select>
+            </div>
+
+            <div class="side-panel">
+              <div class="side-panel-title">Tags</div>
+              <input type="text" class="editor-input" placeholder="+ Adicionar tag" style="font-size: 0.85rem;">
+              <div class="tag-list">
+                <span class="tag">monitor <button class="tag-remove">×</button></span>
+                <span class="tag">ultrawide <button class="tag-remove">×</button></span>
+                <span class="tag">programadores <button class="tag-remove">×</button></span>
+              </div>
+            </div>
+
+            <div class="side-panel">
+              <div class="side-panel-title">Imagem destacada</div>
+              <button class="side-action-btn">📷 Escolher imagem</button>
+            </div>
+
+            <div class="side-panel">
+              <div class="side-panel-title">SEO</div>
+              <div style="font-size: 0.78rem; color: var(--text-soft); line-height: 1.6;">
+                ✓ Título: 78 chars (ótimo)<br>
+                ✓ Descrição: 142 chars<br>
+                ⚠ Adicionar mais 2 imagens<br>
+                ✓ 3 links internos
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ============ PRODUCTS PAGE ============ -->
+      <div class="page" id="page-products">
+        <div class="posts-toolbar">
+          <input type="text" class="search-input" placeholder="Buscar produtos...">
+          <button class="filter-btn">🛒 Plataforma</button>
+          <button class="primary-btn">+ Adicionar Produto</button>
+        </div>
+
+        <div class="products-grid">
+          <div class="product-card-admin">
+            <div class="product-img-admin">🖥️</div>
+            <div class="product-body-admin">
+              <div class="product-name-admin">LG 34WP65C-B Ultrawide</div>
+              <div class="product-price-admin">R$ 2.799</div>
+              <div class="product-meta-admin">
+                <span class="product-platform">Amazon</span>
+                <span>★ 4.8 (247)</span>
+              </div>
+            </div>
+          </div>
+          <div class="product-card-admin">
+            <div class="product-img-admin">⌨️</div>
+            <div class="product-body-admin">
+              <div class="product-name-admin">Keychron K2 Pro</div>
+              <div class="product-price-admin">R$ 899</div>
+              <div class="product-meta-admin">
+                <span class="product-platform">Amazon</span>
+                <span>★ 4.7 (892)</span>
+              </div>
+            </div>
+          </div>
+          <div class="product-card-admin">
+            <div class="product-img-admin">🪑</div>
+            <div class="product-body-admin">
+              <div class="product-name-admin">Cadeira DT3 Sports</div>
+              <div class="product-price-admin">R$ 1.499</div>
+              <div class="product-meta-admin">
+                <span class="product-platform">Mercado Livre</span>
+                <span>★ 4.5 (1.2k)</span>
+              </div>
+            </div>
+          </div>
+          <div class="product-card-admin">
+            <div class="product-img-admin">🎧</div>
+            <div class="product-body-admin">
+              <div class="product-name-admin">Sony WH-1000XM5</div>
+              <div class="product-price-admin">R$ 2.199</div>
+              <div class="product-meta-admin">
+                <span class="product-platform">Amazon</span>
+                <span>★ 4.9 (3.1k)</span>
+              </div>
+            </div>
+          </div>
+          <div class="product-card-admin">
+            <div class="product-img-admin">🖱️</div>
+            <div class="product-body-admin">
+              <div class="product-name-admin">Logitech MX Master 3S</div>
+              <div class="product-price-admin">R$ 749</div>
+              <div class="product-meta-admin">
+                <span class="product-platform">Amazon</span>
+                <span>★ 4.8 (2.4k)</span>
+              </div>
+            </div>
+          </div>
+          <div class="product-card-admin">
+            <div class="product-img-admin">💡</div>
+            <div class="product-body-admin">
+              <div class="product-name-admin">BenQ ScreenBar Halo</div>
+              <div class="product-price-admin">R$ 1.299</div>
+              <div class="product-meta-admin">
+                <span class="product-platform">Amazon</span>
+                <span>★ 4.7 (456)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ CATEGORIES ============ -->
+      <div class="page" id="page-categories">
+        <div class="settings-panel">
+          <div class="settings-section">
+            <div class="settings-section-title">Categorias do blog</div>
+            <p style="color: var(--text-soft); font-size: 0.88rem; margin-bottom: 16px;">Gerencie as categorias que aparecem no menu e nos posts.</p>
+            <div class="products-grid">
+              <div class="product-card-admin"><div class="product-body-admin"><div class="product-name-admin">🖥️ Monitores</div><div class="product-meta-admin"><span>23 posts</span></div></div></div>
+              <div class="product-card-admin"><div class="product-body-admin"><div class="product-name-admin">⌨️ Teclados</div><div class="product-meta-admin"><span>31 posts</span></div></div></div>
+              <div class="product-card-admin"><div class="product-body-admin"><div class="product-name-admin">🖱️ Mouses</div><div class="product-meta-admin"><span>18 posts</span></div></div></div>
+              <div class="product-card-admin"><div class="product-body-admin"><div class="product-name-admin">🪑 Cadeiras</div><div class="product-meta-admin"><span>15 posts</span></div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ ANALYTICS ============ -->
+      <div class="page" id="page-analytics">
+        <div class="stats-grid">
+          <div class="stat-card views">
+            <div class="stat-label"><span class="stat-icon">👁️</span> Total visualizações</div>
+            <div class="stat-value">47.2k</div>
+            <div class="stat-trend">↗ +18.2%</div>
+          </div>
+          <div class="stat-card clicks">
+            <div class="stat-label"><span class="stat-icon">🖱️</span> Cliques afiliado</div>
+            <div class="stat-value">2.847</div>
+            <div class="stat-trend">↗ +24%</div>
+          </div>
+          <div class="stat-card revenue">
+            <div class="stat-label"><span class="stat-icon">💰</span> Comissões total</div>
+            <div class="stat-value">R$ 4.892</div>
+            <div class="stat-trend">↗ +R$ 1.247</div>
+          </div>
+          <div class="stat-card posts">
+            <div class="stat-label"><span class="stat-icon">📊</span> Taxa conversão</div>
+            <div class="stat-value">6.0%</div>
+            <div class="stat-trend">↗ +0.8pp</div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-header">
+            <h3 class="panel-title">Top 5 posts em conversão</h3>
+          </div>
+          <div class="activity-list">
+            <div class="activity-item">
+              <div class="activity-icon gold">🥇</div>
+              <div>
+                <div class="activity-text"><strong>Cadeira gamer x ergonômica</strong></div>
+                <div class="activity-time">2.4k views · 312 cliques · R$ 487 comissão</div>
+              </div>
+              <div class="activity-amount">13% conv</div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon gold">🥈</div>
+              <div>
+                <div class="activity-text"><strong>Top 7 monitores ultrawide</strong></div>
+                <div class="activity-time">3.2k views · 287 cliques · R$ 412 comissão</div>
+              </div>
+              <div class="activity-amount">9% conv</div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon gold">🥉</div>
+              <div>
+                <div class="activity-text"><strong>5 teclados abaixo de R$ 400</strong></div>
+                <div class="activity-time">1.8k views · 156 cliques · R$ 187 comissão</div>
+              </div>
+              <div class="activity-amount">8.7% conv</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ SETTINGS ============ -->
+      <div class="page" id="page-settings">
+        <div class="settings-panel">
+
+          <div class="settings-section">
+            <div class="settings-section-title">Informações do blog</div>
+            <div class="settings-row">
+              <div>
+                <label style="display:block; font-size:0.8rem; color: var(--text-soft); margin-bottom: 8px;">Nome do site</label>
+                <input type="text" class="editor-input" value="SetupBrasil">
+              </div>
+              <div>
+                <label style="display:block; font-size:0.8rem; color: var(--text-soft); margin-bottom: 8px;">Slogan</label>
+                <input type="text" class="editor-input" value="Reviews honestos pro seu setup tech">
+              </div>
+            </div>
+            <label style="display:block; font-size:0.8rem; color: var(--text-soft); margin-bottom: 8px;">Descrição (SEO)</label>
+            <input type="text" class="editor-input" value="Reviews, comparativos e guias dos melhores periféricos, monitores e acessórios pro seu setup.">
+          </div>
+
+          <div class="settings-section">
+            <div class="settings-section-title">IDs de afiliado</div>
+            <div class="settings-row">
+              <div>
+                <label style="display:block; font-size:0.8rem; color: var(--text-soft); margin-bottom: 8px;">Amazon Associados</label>
+                <input type="text" class="editor-input" placeholder="setupbrasil-20">
+              </div>
+              <div>
+                <label style="display:block; font-size:0.8rem; color: var(--text-soft); margin-bottom: 8px;">Mercado Livre</label>
+                <input type="text" class="editor-input" placeholder="seu-id-ml">
+              </div>
+            </div>
+          </div>
+
+          <div class="settings-section">
+            <div class="settings-section-title">API de IA</div>
+            <label style="display:block; font-size:0.8rem; color: var(--text-soft); margin-bottom: 8px;">Chave da API (Claude/OpenAI)</label>
+            <input type="password" class="editor-input" placeholder="sk-..." value="sk-ant-***************">
+            <p style="color: var(--text-muted); font-size: 0.78rem; margin-top: 8px;">Use sua chave para integrar com o assistente de IA.</p>
+          </div>
+
+          <div class="settings-section">
+            <div class="settings-section-title">Aparência</div>
+            <label style="display:block; font-size:0.8rem; color: var(--text-soft); margin-bottom: 8px;">Cor de destaque</label>
+            <div style="display:flex; gap: 10px;">
+              <div style="width: 40px; height: 40px; background: #ff5722; border-radius: 10px; cursor: pointer; border: 2px solid var(--accent);"></div>
+              <div style="width: 40px; height: 40px; background: #3b82f6; border-radius: 10px; cursor: pointer; border: 2px solid var(--border);"></div>
+              <div style="width: 40px; height: 40px; background: #22c55e; border-radius: 10px; cursor: pointer; border: 2px solid var(--border);"></div>
+              <div style="width: 40px; height: 40px; background: #a855f7; border-radius: 10px; cursor: pointer; border: 2px solid var(--border);"></div>
+              <div style="width: 40px; height: 40px; background: #ec4899; border-radius: 10px; cursor: pointer; border: 2px solid var(--border);"></div>
+            </div>
+          </div>
+
+          <button class="primary-btn" style="width: 100%; padding: 14px;" onclick="showToast('Configurações salvas! ✓')">💾 Salvar configurações</button>
+
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">
+  <span>✓</span>
+  <span id="toastMsg">Sucesso!</span>
+</div>
+
+<script>
+  // ===== AUTH CHECK =====
+  try {
+    if (localStorage.getItem('auth') !== 'true') {
+      window.location.href = 'login.html';
+    }
+  } catch(e) {}
+
+  // ===== THEME =====
+  function toggleTheme() {
+    const html = document.documentElement;
+    const current = html.getAttribute('data-theme');
+    const newTheme = current === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', newTheme);
+    document.getElementById('themeBtn').textContent = newTheme === 'dark' ? '🌙' : '☀️';
+    try { localStorage.setItem('theme', newTheme); } catch(e) {}
+  }
+
+  try {
+    const saved = localStorage.getItem('theme');
+    if (saved) {
+      document.documentElement.setAttribute('data-theme', saved);
+      document.getElementById('themeBtn').textContent = saved === 'dark' ? '🌙' : '☀️';
+    }
+  } catch(e) {}
+
+  // ===== NAVIGATION =====
+  const titles = {
+    dashboard: 'Dashboard',
+    posts: 'Todos os posts',
+    editor: 'Editor de post',
+    products: 'Produtos afiliados',
+    categories: 'Categorias',
+    analytics: 'Analytics',
+    settings: 'Configurações'
+  };
+
+  function showPage(page) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+    document.getElementById('page-' + page).classList.add('active');
+    document.querySelector(`.sidebar-link[data-page="${page}"]`)?.classList.add('active');
+    document.getElementById('pageTitle').innerHTML = titles[page] || page;
+    window.scrollTo(0, 0);
+  }
+
+  // ===== AI GENERATE =====
+  function setPrompt(text) {
+    document.getElementById('aiPrompt').value = text + ' sobre ';
+    document.getElementById('aiPrompt').focus();
+  }
+
+  async function generateContent() {
+    const prompt = document.getElementById('aiPrompt').value.trim();
+    const btn = document.getElementById('aiBtn');
+    const btnText = document.getElementById('aiBtnText');
+
+    if (!prompt) {
+      showToast('Descreva o que você quer escrever primeiro 🙂');
+      return;
+    }
+
+    btn.disabled = true;
+    btnText.textContent = 'Gerando conteúdo...';
+
+    // Simulate AI generation (in production, this would call your API)
+    setTimeout(() => {
+      const titleField = document.getElementById('postTitle');
+      const excerptField = document.getElementById('postExcerpt');
+      const contentField = document.getElementById('postContent');
+
+      // Demo content based on common patterns
+      titleField.value = '7 produtos que vão transformar seu setup em 2026';
+      excerptField.value = 'Selecionamos os melhores upgrades de setup com bom custo-benefício para você melhorar sua produtividade.';
+      contentField.value = `# Os melhores upgrades de setup pra 2026
+
+Trabalhar bem começa com um espaço bem montado. Independente se você é dev, designer, criador de conteúdo ou apenas alguém que passa muitas horas em frente ao computador, a qualidade do seu setup impacta diretamente na sua produtividade e saúde.
+
+## Por que investir num bom setup?
+
+Estudos da Harvard Business Review mostram que profissionais com setups ergonômicos têm 23% mais produtividade e 40% menos problemas de saúde ocupacional. Não é só estética — é investimento em você mesmo.
+
+## 1. Cadeira ergonômica
+
+A base de tudo. Você passa em média 8 horas por dia sentado, então economizar aqui é furada. Modelos como a DT3 Sports e a Flexform Plus oferecem suporte lombar adequado por menos de R$ 1.500.
+
+## 2. Monitor secundário
+
+Aumenta a produtividade em até 42% segundo estudo da Universidade de Utah. Para começar, um 24" Full HD da LG ou Samsung resolve.
+
+## 3. Teclado mecânico
+
+Menos cansaço nos dedos, mais precisão. Switches lineares (red) para gamers, táteis (brown) para programadores.
+
+## 4. Mouse vertical
+
+Reduz drasticamente as dores no pulso. O Logitech MX Vertical é referência, mas o Anker custa metade do preço.
+
+## 5. Iluminação adequada
+
+Reduz fadiga ocular. Uma luminária BenQ ScreenBar é o investimento mais subestimado em qualidade de setup.
+
+## 6. Headset com cancelamento
+
+Foco total em ambientes barulhentos. Sony WH-1000XM5 é o padrão-ouro, mas o Soundcore Q45 entrega 80% por 1/3 do preço.
+
+## 7. Suporte para notebook
+
+Coloca a tela na altura dos olhos, evita dores cervicais. Modelos da Baseus e Nillkin custam menos de R$ 200.
+
+## Conclusão
+
+Invista aos poucos, começando pela cadeira e iluminação. Esses são os itens com maior impacto na sua saúde e produtividade.`;
+
+      btn.disabled = false;
+      btnText.textContent = 'Gerar conteúdo com IA';
+      showToast('✨ Conteúdo gerado! Revise e edite conforme necessário.');
+    }, 2000);
+  }
+
+  // ===== UTILS =====
+  function showToast(msg) {
+    document.getElementById('toastMsg').textContent = msg;
+    const toast = document.getElementById('toast');
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 3000);
+  }
+
+  function publishPost() {
+    showToast('🚀 Post publicado com sucesso!');
+    setTimeout(() => showPage('posts'), 1500);
+  }
+
+  function logout() {
+    if (confirm('Deseja sair do painel?')) {
+      try { localStorage.removeItem('auth'); } catch(e) {}
+      window.location.href = 'login.html';
+    }
+  }
+</script>
+
+</body>
+</html>
