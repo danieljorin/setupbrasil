@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
 import Navbar from '../../components/Navbar';
 
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({ params }: { params: { slug: string } }) {
   const { data: post } = await supabase

@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { supabase } from '@/lib/supabase/client';
 import Navbar from './components/Navbar';
 
-export const revalidate = 60; // ISR: revalida a cada 60s
+export const dynamic = 'force-dynamic';
 
 export default async function HomePage() {
   // Buscar categorias e posts reais do banco

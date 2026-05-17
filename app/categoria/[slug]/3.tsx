@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
 import Navbar from '../../components/Navbar';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 60;
 
 export default async function CategoryPage({ params }: { params: { slug: string } }) {
   const { data: category } = await supabase
