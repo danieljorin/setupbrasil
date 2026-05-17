@@ -1,10 +1,12 @@
 import Link from 'next/link';
-import { supabase } from '@/lib/supabase/client';
+import { createSupabaseServerClient } from '@/lib/supabase/server';
 import Navbar from './components/Navbar';
 
 export const dynamic = 'force-dynamic';
 
 export default async function HomePage() {
+  const supabase = createSupabaseServerClient();
+
   // Buscar categorias e posts reais do banco
   const [{ data: categories }, { data: posts }] = await Promise.all([
     supabase.from('categories').select('*').order('id'),
