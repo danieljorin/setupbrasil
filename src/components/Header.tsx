@@ -3,12 +3,13 @@ import Link from 'next/link'
 import { useState, useEffect } from 'react'
 
 const categories = [
-  { name: 'Monitores', slug: 'monitores' },
-  { name: 'Teclados', slug: 'teclados' },
-  { name: 'Mouses', slug: 'mouses' },
-  { name: 'Cadeiras', slug: 'cadeiras' },
-  { name: 'Headsets', slug: 'headsets' },
-  { name: 'Notebooks', slug: 'notebooks' },
+  { name: 'Monitores', slug: 'monitores', icon: '🖥️' },
+  { name: 'Teclados', slug: 'teclados', icon: '⌨️' },
+  { name: 'Mouses', slug: 'mouses', icon: '🖱️' },
+  { name: 'Cadeiras', slug: 'cadeiras', icon: '🪑' },
+  { name: 'Headsets', slug: 'headsets', icon: '🎧' },
+  { name: 'Notebooks', slug: 'notebooks', icon: '💻' },
+  { name: 'Acessórios', slug: 'acessorios', icon: '🔌' },
 ]
 
 export default function Header() {
@@ -26,59 +27,53 @@ export default function Header() {
   }
 
   return (
-    <header className="sticky top-0 z-50 bg-white/95 dark:bg-gray-950/95 backdrop-blur border-b border-gray-200 dark:border-gray-800">
-      <div className="max-w-6xl mx-auto px-4">
-        {/* Linha principal */}
-        <div className="flex items-center justify-between h-16">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: '#ff5722' }}>
-              <span className="text-white text-sm font-bold">SB</span>
+    <header style={{ borderBottom: '1px solid #e5e7eb' }} className="sticky top-0 z-50 bg-white dark:bg-gray-950 dark:border-gray-800">
+      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 16px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 64 }}>
+          
+          {/* Logo */}
+          <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
+            <div style={{ width: 36, height: 36, borderRadius: 10, background: '#ff5722', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <span style={{ color: 'white', fontWeight: 800, fontSize: 14 }}>SB</span>
             </div>
-            <span className="font-bold text-lg text-gray-900 dark:text-white">SetupBrasil</span>
+            <span style={{ fontWeight: 800, fontSize: 18, color: 'inherit' }}>SetupBrasil</span>
           </Link>
 
-          <div className="flex items-center gap-3">
-            <button
-              onClick={toggleTheme}
-              className="p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-              aria-label="Alternar tema"
-            >
+          {/* Nav desktop */}
+          <nav style={{ display: 'flex', alignItems: 'center', gap: 4 }} className="hidden md:flex">
+            {categories.map((cat) => (
+              <Link
+                key={cat.slug}
+                href={`/categoria/${cat.slug}`}
+                style={{ padding: '6px 12px', borderRadius: 8, fontSize: 14, fontWeight: 500, color: 'inherit', textDecoration: 'none', transition: 'background 0.15s' }}
+                className="hover:bg-orange-50 hover:text-orange-600 dark:hover:bg-orange-950 dark:hover:text-orange-400"
+              >
+                {cat.name}
+              </Link>
+            ))}
+          </nav>
+
+          {/* Ações */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <button onClick={toggleTheme} style={{ width: 36, height: 36, borderRadius: 8, border: '1px solid #e5e7eb', background: 'transparent', cursor: 'pointer', fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }} className="dark:border-gray-700">
               {dark ? '☀️' : '🌙'}
             </button>
-            <button
-              onClick={() => setMenuOpen(!menuOpen)}
-              className="md:hidden p-2 rounded-lg text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800"
-            >
+            <button onClick={() => setMenuOpen(!menuOpen)} style={{ width: 36, height: 36, borderRadius: 8, border: '1px solid #e5e7eb', background: 'transparent', cursor: 'pointer', fontSize: 18, display: 'flex', alignItems: 'center', justifyContent: 'center' }} className="md:hidden dark:border-gray-700">
               {menuOpen ? '✕' : '☰'}
             </button>
           </div>
         </div>
-
-        {/* Nav categorias — desktop */}
-        <nav className="hidden md:flex items-center gap-1 pb-2 overflow-x-auto">
-          {categories.map((cat) => (
-            <Link
-              key={cat.slug}
-              href={`/categoria/${cat.slug}`}
-              className="px-3 py-1.5 text-sm rounded-full text-gray-600 dark:text-gray-400 hover:text-brand hover:bg-orange-50 dark:hover:bg-orange-950/30 transition-colors whitespace-nowrap"
-            >
-              {cat.name}
-            </Link>
-          ))}
-        </nav>
       </div>
 
       {/* Menu mobile */}
       {menuOpen && (
-        <div className="md:hidden border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950">
+        <div style={{ borderTop: '1px solid #e5e7eb', padding: '8px 0' }} className="md:hidden bg-white dark:bg-gray-950 dark:border-gray-800">
           {categories.map((cat) => (
-            <Link
-              key={cat.slug}
-              href={`/categoria/${cat.slug}`}
-              onClick={() => setMenuOpen(false)}
-              className="block px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900"
-            >
-              {cat.name}
+            <Link key={cat.slug} href={`/categoria/${cat.slug}`} onClick={() => setMenuOpen(false)}
+              style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px', fontSize: 15, fontWeight: 500, color: 'inherit', textDecoration: 'none' }}
+              className="hover:bg-gray-50 dark:hover:bg-gray-900">
+              <span>{cat.icon}</span>
+              <span>{cat.name}</span>
             </Link>
           ))}
         </div>
