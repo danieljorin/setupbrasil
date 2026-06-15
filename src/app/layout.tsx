@@ -2,8 +2,8 @@ import type { Metadata } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: { default: 'SetupBrasil', template: '%s | SetupBrasil' },
-  description: 'Reviews e guias de setup gamer e produtividade',
+  title: { default: 'SetupBrasil — Seu guia definitivo de setup', template: '%s | SetupBrasil' },
+  description: 'Reviews honestos, comparativos e dicas para montar o setup perfeito. Monitores, teclados, cadeiras, headsets e muito mais.',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -13,9 +13,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-        <script dangerouslySetInnerHTML={{ __html: `(function(){try{var t=localStorage.getItem('theme');if(t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.classList.add('dark')}}catch(e){}})()` }} />
+        <script dangerouslySetInnerHTML={{
+          __html: `(function(){try{var t=localStorage.getItem('theme');if(t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.classList.add('dark')}}catch(e){}})()`,
+        }} />
       </head>
-      <body style={{ fontFamily: "'Inter', system-ui, sans-serif" }} className="min-h-screen flex flex-col bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100">
+      <body className="min-h-screen flex flex-col">
         {children}
       </body>
     </html>
