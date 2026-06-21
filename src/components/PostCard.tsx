@@ -17,16 +17,16 @@ export default function PostCard({ post }: { post: Post }) {
   })
 
   return (
-    <Link href={`/post/${post.slug}`} className="group block">
-      <article className="rounded-xl overflow-hidden border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:border-brand dark:hover:border-brand transition-colors h-full flex flex-col">
+    <Link href={`/post/${post.slug}`} className="group block h-full">
+      <article className="glass-panel rounded-xl overflow-hidden h-full flex flex-col glow-hover transition-all duration-300">
         {/* Imagem */}
-        <div className="relative aspect-video bg-gray-100 dark:bg-gray-800 overflow-hidden">
+        <div className="relative aspect-video bg-cyber-dark overflow-hidden">
           {post.cover_image ? (
             <Image
               src={post.cover_image}
               alt={post.title}
               fill
-              className="object-cover group-hover:scale-105 transition-transform duration-300"
+              className="object-cover group-hover:scale-105 transition-transform duration-500"
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
@@ -34,23 +34,26 @@ export default function PostCard({ post }: { post: Post }) {
             </div>
           )}
           {post.categories && (
-            <span className="absolute top-3 left-3 text-xs font-semibold px-2 py-1 rounded-full text-white" style={{ background: '#ff5722' }}>
-              {post.categories.name}
+            <span className="absolute top-3 left-3 bg-cyber-dark/80 border border-cyber-cyan/40 px-3 py-1 text-[10px] font-orbitron font-bold text-cyber-cyan rounded">
+              {post.categories.name.toUpperCase()}
             </span>
           )}
         </div>
 
         {/* Conteúdo */}
-        <div className="p-4 flex flex-col flex-1">
-          <h2 className="font-bold text-gray-900 dark:text-white group-hover:text-brand transition-colors line-clamp-2 mb-2">
+        <div className="p-5 flex flex-col flex-1">
+          <span className="text-[11px] text-petroleum-400 font-space mb-2">{date}</span>
+          <h2 className="font-orbitron font-bold text-base text-white group-hover:text-cyber-cyan transition-colors line-clamp-2 mb-2">
             {post.title}
           </h2>
           {post.excerpt && (
-            <p className="text-sm text-gray-500 dark:text-gray-400 line-clamp-2 flex-1 mb-3">
+            <p className="text-xs text-gray-400 font-space leading-relaxed line-clamp-2 flex-1 mb-3">
               {post.excerpt}
             </p>
           )}
-          <time className="text-xs text-gray-400 dark:text-gray-600">{date}</time>
+          <span className="text-left font-orbitron text-[11px] font-bold text-cyber-cyan group-hover:text-white transition flex items-center gap-1">
+            LER ARTIGO <span aria-hidden>→</span>
+          </span>
         </div>
       </article>
     </Link>

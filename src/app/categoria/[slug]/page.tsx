@@ -36,22 +36,20 @@ export default async function CategoriaPage({ params }: { params: { slug: string
   return (
     <>
       <Header />
-      <main className="flex-1 max-w-6xl mx-auto w-full px-4 py-10">
-        {/* Header da categoria */}
-        <div className="mb-10 pb-6 border-b border-gray-200 dark:border-gray-800">
+      <main className="flex-1 max-w-6xl mx-auto w-full px-4 sm:px-6 py-10">
+        <div className="mb-10 pb-6 border-b border-cyber-border">
           <div className="flex items-center gap-3 mb-2">
             <span className="text-4xl">{category.icon}</span>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">{category.name}</h1>
+            <h1 className="font-orbitron font-black text-2xl md:text-3xl text-white">{category.name.toUpperCase()}</h1>
           </div>
           {category.description && (
-            <p className="text-gray-500 dark:text-gray-400 ml-14">{category.description}</p>
+            <p className="text-gray-400 ml-14 font-space text-sm">{category.description}</p>
           )}
-          <p className="text-sm text-gray-400 ml-14 mt-1">
-            {posts?.length || 0} {posts?.length === 1 ? 'post' : 'posts'}
+          <p className="text-xs text-petroleum-400 ml-14 mt-1 font-orbitron">
+            {posts?.length || 0} {posts?.length === 1 ? 'POST' : 'POSTS'}
           </p>
         </div>
 
-        {/* Grid de posts */}
         {posts && posts.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {posts.map((post) => (
@@ -59,9 +57,9 @@ export default async function CategoriaPage({ params }: { params: { slug: string
             ))}
           </div>
         ) : (
-          <div className="text-center py-20 text-gray-400 dark:text-gray-600">
-            <div className="text-5xl mb-4">{category.icon}</div>
-            <p className="text-lg font-medium">Nenhum post nessa categoria ainda.</p>
+          <div className="text-center py-20">
+            <div className="text-5xl mb-4 opacity-40">{category.icon}</div>
+            <p className="text-gray-400 font-space">Nenhum post nessa categoria ainda.</p>
           </div>
         )}
       </main>

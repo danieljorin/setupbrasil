@@ -1,0 +1,33 @@
+PACOTE COMPLETO - REDESIGN SETUP BRASIL
+=========================================
+
+Esse ZIP tem TODOS os arquivos criados ou alterados durante o redesign
+(visual cyberpunk dark + logo nova). Extrai e sobrescreve direto na pasta
+do projeto, mantendo essa mesma estrutura de pastas.
+
+IMPORTANTE - antes de copiar:
+1. Apague o arquivo src/app/icon.svg do seu projeto, se ele existir.
+   (Foi substituído por src/app/icon.png nesse pacote.)
+
+Arquivos inclusos:
+- tailwind.config.ts                          -> paleta de cores + fontes
+- src/app/globals.css                         -> estilos globais dark theme
+- src/app/layout.tsx                          -> fontes Orbitron/Space Grotesk
+- src/app/page.tsx                            -> home redesenhada
+- src/app/not-found.tsx                       -> página 404 redesenhada
+- src/app/favicon.ico                         -> favicon (aba do navegador)
+- src/app/apple-icon.png                      -> ícone tela inicial iPhone
+- src/app/icon.png                            -> ícone PWA/Android
+- src/app/categoria/[slug]/page.tsx           -> página de categoria
+- src/app/post/[slug]/page.tsx                -> página de post
+- src/components/Header.tsx                   -> cabeçalho com logo nova
+- src/components/Footer.tsx                   -> rodapé com logo nova
+- src/components/PostCard.tsx                 -> card de post (glass panel)
+- src/components/PcbBackground.tsx            -> fundo animado (novo arquivo)
+- public/brand/*.png                          -> logo em vários tamanhos/usos
+
+Depois de copiar tudo:
+1. GitHub Desktop > confirma os arquivos alterados > commit > push
+2. Vercel redeploy automático (1-2 min)
+3. O bug do 404 em setupbrasil.com é separado disso e ainda precisa
+   ser debugado depois - não é esse pacote que resolve aquilo.

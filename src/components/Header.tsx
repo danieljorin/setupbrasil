@@ -1,6 +1,6 @@
 'use client'
 import Link from 'next/link'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 
 const categories = [
   { name: 'Monitores', slug: 'monitores', icon: '🖥️' },
@@ -13,67 +13,70 @@ const categories = [
 ]
 
 export default function Header() {
-  const [dark, setDark] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
 
-  useEffect(() => {
-    setDark(document.documentElement.classList.contains('dark'))
-  }, [])
-
-  const toggleTheme = () => {
-    const isDark = document.documentElement.classList.toggle('dark')
-    localStorage.setItem('theme', isDark ? 'dark' : 'light')
-    setDark(isDark)
-  }
-
   return (
-    <header style={{ borderBottom: '1px solid #e5e7eb' }} className="sticky top-0 z-50 bg-white dark:bg-gray-950 dark:border-gray-800">
-      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 16px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 64 }}>
-          
-          {/* Logo */}
-          <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
-            <div style={{ width: 36, height: 36, borderRadius: 10, background: '#ff5722', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <span style={{ color: 'white', fontWeight: 800, fontSize: 14 }}>SB</span>
-            </div>
-            <span style={{ fontWeight: 800, fontSize: 18, color: 'inherit' }}>SetupBrasil</span>
-          </Link>
+    <header className="sticky top-0 z-50 w-full border-b border-cyber-border glass-panel">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
 
-          {/* Nav desktop */}
-          <nav style={{ display: 'flex', alignItems: 'center', gap: 4 }} className="hidden md:flex">
-            {categories.map((cat) => (
-              <Link
-                key={cat.slug}
-                href={`/categoria/${cat.slug}`}
-                style={{ padding: '6px 12px', borderRadius: 8, fontSize: 14, fontWeight: 500, color: 'inherit', textDecoration: 'none', transition: 'background 0.15s' }}
-                className="hover:bg-orange-50 hover:text-orange-600 dark:hover:bg-orange-950 dark:hover:text-orange-400"
-              >
-                {cat.name}
-              </Link>
-            ))}
-          </nav>
-
-          {/* Ações */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <button onClick={toggleTheme} style={{ width: 36, height: 36, borderRadius: 8, border: '1px solid #e5e7eb', background: 'transparent', cursor: 'pointer', fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }} className="dark:border-gray-700">
-              {dark ? '☀️' : '🌙'}
-            </button>
-            <button onClick={() => setMenuOpen(!menuOpen)} style={{ width: 36, height: 36, borderRadius: 8, border: '1px solid #e5e7eb', background: 'transparent', cursor: 'pointer', fontSize: 18, display: 'flex', alignItems: 'center', justifyContent: 'center' }} className="md:hidden dark:border-gray-700">
-              {menuOpen ? '✕' : '☰'}
-            </button>
+        {/* Logo */}
+        <Link href="/" className="flex items-center gap-3 group">
+          <img
+            src="/brand/logo-mark.png"
+            alt="SetupBrasil"
+            className="w-12 h-12 transition-transform duration-300 group-hover:scale-105"
+          />
+          <div>
+            <span className="font-orbitron font-black text-lg sm:text-xl tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-white via-cyan-100 to-petroleum-400">
+              SETUP <span className="text-cyber-cyan">BRASIL</span>
+            </span>
+            <span className="block text-[9px] uppercase tracking-[0.2em] text-petroleum-400 font-orbitron font-semibold">
+              Setup bom, sem gastar mal
+            </span>
           </div>
-        </div>
+        </Link>
+
+        {/* Nav desktop */}
+        <nav className="hidden md:flex items-center gap-1 lg:gap-2 font-orbitron text-[11px] lg:text-xs">
+          <Link href="/" className="px-3 py-2 text-cyber-cyan border-b-2 border-cyber-cyan transition duration-200">
+            HOME
+          </Link>
+          {categories.slice(0, 5).map((cat) => (
+            <Link
+              key={cat.slug}
+              href={`/categoria/${cat.slug}`}
+              className="px-3 py-2 text-gray-300 hover:text-cyber-cyan border-b-2 border-transparent hover:border-petroleum-500/50 transition duration-200"
+            >
+              {cat.name.toUpperCase()}
+            </Link>
+          ))}
+        </nav>
+
+        {/* Botão menu mobile */}
+        <button
+          onClick={() => setMenuOpen(!menuOpen)}
+          className="md:hidden flex items-center justify-center w-10 h-10 rounded-md text-cyber-cyan border border-cyber-border"
+          aria-label="Abrir menu"
+        >
+          <span className="text-xl">{menuOpen ? '✕' : '☰'}</span>
+        </button>
       </div>
 
       {/* Menu mobile */}
       {menuOpen && (
-        <div style={{ borderTop: '1px solid #e5e7eb', padding: '8px 0' }} className="md:hidden bg-white dark:bg-gray-950 dark:border-gray-800">
+        <div className="md:hidden border-t border-cyber-border bg-cyber-dark/95 backdrop-blur-xl px-4 py-4 space-y-1 font-orbitron text-sm">
+          <Link href="/" onClick={() => setMenuOpen(false)} className="block px-4 py-3 text-cyber-cyan bg-petroleum-950/60 rounded-md">
+            HOME
+          </Link>
           {categories.map((cat) => (
-            <Link key={cat.slug} href={`/categoria/${cat.slug}`} onClick={() => setMenuOpen(false)}
-              style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px', fontSize: 15, fontWeight: 500, color: 'inherit', textDecoration: 'none' }}
-              className="hover:bg-gray-50 dark:hover:bg-gray-900">
+            <Link
+              key={cat.slug}
+              href={`/categoria/${cat.slug}`}
+              onClick={() => setMenuOpen(false)}
+              className="flex items-center gap-2 px-4 py-3 text-gray-300 hover:text-cyber-cyan hover:bg-petroleum-950/30 rounded-md"
+            >
               <span>{cat.icon}</span>
-              <span>{cat.name}</span>
+              <span>{cat.name.toUpperCase()}</span>
             </Link>
           ))}
         </div>

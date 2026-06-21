@@ -1,81 +1,22 @@
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+import PostCard from '@/components/PostCard'
 import Link from 'next/link'
 
 export const dynamic = 'force-dynamic'
 
-function readingTime(content: string) {
-  const words = (content || '').replace(/<[^>]*>/g, '').split(/\s+/).filter(Boolean).length
-  return Math.max(1, Math.ceil(words / 200))
-}
-
-function PostTag({ name }: { name: string }) {
+function SideNewsItem({ post, index }: { post: any; index: number }) {
   return (
-    <span style={{ display: 'inline-block', background: '#fff3ef', color: '#ff5722', fontSize: 11, fontWeight: 700, padding: '2px 8px', borderRadius: 100, border: '1px solid #ffd5c8' }}>
-      {name}
-    </span>
-  )
-}
-
-function CardSmall({ post }: { post: any }) {
-  const mins = readingTime(post.content)
-  return (
-    <Link href={`/post/${post.slug}`} style={{ textDecoration: 'none', color: 'inherit', display: 'block', height: '100%' }}>
-      <article style={{ display: 'flex', gap: 12, padding: '14px 0', borderBottom: '1px solid #f3f4f6', alignItems: 'flex-start' }} className="dark:border-gray-800 group">
-        <div style={{ width: 80, height: 60, borderRadius: 10, overflow: 'hidden', flexShrink: 0, background: '#f3f4f6' }} className="dark:bg-gray-800">
-          {post.cover_image
-            ? <img src={post.cover_image} alt={post.title} style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.3s' }} className="group-hover:scale-105" />
-            : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, opacity: 0.3 }}>🖥️</div>
-          }
-        </div>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <h3 style={{ fontWeight: 700, fontSize: 14, lineHeight: 1.4, marginBottom: 6, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }} className="group-hover:text-orange-500" >
-            {post.title}
-          </h3>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-            {post.categories && <PostTag name={post.categories.name} />}
-            <span style={{ fontSize: 11, color: '#9ca3af' }}>⏱️ {mins} min</span>
-          </div>
-        </div>
-      </article>
-    </Link>
-  )
-}
-
-function CardLarge({ post }: { post: any }) {
-  const mins = readingTime(post.content)
-  const date = new Date(post.created_at).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' })
-  return (
-    <Link href={`/post/${post.slug}`} style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}>
-      <article style={{ borderRadius: 20, border: '1px solid #e5e7eb', background: 'white', overflow: 'hidden', height: '100%', display: 'flex', flexDirection: 'column', transition: 'all 0.25s', cursor: 'pointer' }} className="group hover:shadow-xl hover:-translate-y-1 dark:bg-gray-900 dark:border-gray-800">
-        <div style={{ position: 'relative', aspectRatio: '16/9', background: '#f3f4f6', overflow: 'hidden' }} className="dark:bg-gray-800">
-          {post.cover_image
-            ? <img src={post.cover_image} alt={post.title} style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.4s ease' }} className="group-hover:scale-105" />
-            : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 48, opacity: 0.2 }}>🖥️</div>
-          }
-          {post.categories && (
-            <span style={{ position: 'absolute', top: 12, left: 12, background: '#ff5722', color: 'white', fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 100 }}>
-              {post.categories.name}
-            </span>
-          )}
-        </div>
-        <div style={{ padding: '18px', flex: 1, display: 'flex', flexDirection: 'column' }}>
-          <h3 style={{ fontWeight: 700, fontSize: 16, lineHeight: 1.45, marginBottom: 8, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', transition: 'color 0.2s' }} className="group-hover:text-orange-500">
-            {post.title}
-          </h3>
-          {post.excerpt && (
-            <p style={{ fontSize: 13, color: '#6b7280', lineHeight: 1.55, flex: 1, marginBottom: 12, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-              {post.excerpt}
-            </p>
-          )}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-            <time style={{ fontSize: 12, color: '#9ca3af' }}>{date}</time>
-            <span style={{ fontSize: 12, color: '#9ca3af' }}>·</span>
-            <span style={{ fontSize: 12, color: '#9ca3af' }}>⏱️ {mins} min de leitura</span>
-          </div>
-        </div>
-      </article>
+    <Link href={`/post/${post.slug}`} className="group block">
+      <div className="flex gap-3 items-start py-3 border-b border-cyber-border last:border-b-0">
+        <span className="font-orbitron font-black text-lg text-petroleum-600 group-hover:text-cyber-cyan transition min-w-[28px] leading-none">
+          {String(index + 1).padStart(2, '0')}
+        </span>
+        <p className="text-sm font-medium text-gray-300 leading-snug line-clamp-2 group-hover:text-cyber-cyan transition font-space">
+          {post.title}
+        </p>
+      </div>
     </Link>
   )
 }
@@ -90,13 +31,12 @@ export default async function HomePage() {
   ])
 
   const posts = allPosts || []
-  const heroMain = posts.find(p => p.featured) || posts[0]
-  const heroSide = posts.filter(p => p.id !== heroMain?.id).slice(0, 2)
-  const restPosts = posts.filter(p => p.id !== heroMain?.id && !heroSide.find(s => s.id === p.id))
+  const heroMain = posts.find((p) => p.featured) || posts[0]
+  const heroSide = posts.filter((p) => p.id !== heroMain?.id).slice(0, 4)
+  const restPosts = posts.filter((p) => p.id !== heroMain?.id && !heroSide.find((s) => s.id === p.id))
 
-  // Agrupar posts por categoria
   const postsByCategory: Record<string, { cat: any; posts: any[] }> = {}
-  restPosts.forEach(post => {
+  restPosts.forEach((post) => {
     if (post.categories) {
       const slug = post.categories.slug
       if (!postsByCategory[slug]) postsByCategory[slug] = { cat: post.categories, posts: [] }
@@ -105,178 +45,185 @@ export default async function HomePage() {
   })
 
   const hasContent = posts.length > 0
+  const heroDate = heroMain ? new Date(heroMain.created_at).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' }) : ''
 
   return (
     <>
       <Header />
-      <main style={{ flex: 1 }}>
-        <div style={{ maxWidth: 1200, margin: '0 auto', padding: '32px 16px' }}>
+      <main className="flex-1">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
 
-          {/* ===== HERO SECTION ===== */}
+          {/* ===== HERO ===== */}
           {hasContent && heroMain ? (
-            <section style={{ marginBottom: 56 }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 20 }} className="md:grid-cols-[3fr_2fr]">
+            <section className="mb-14">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
 
-                {/* Post principal */}
-                <Link href={`/post/${heroMain.slug}`} style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}>
-                  <div style={{ position: 'relative', borderRadius: 20, overflow: 'hidden', background: '#111827', minHeight: 400, display: 'flex', alignItems: 'flex-end', cursor: 'pointer' }} className="group">
-                    {heroMain.cover_image && (
-                      <img src={heroMain.cover_image} alt={heroMain.title} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: 0.5, transition: 'transform 0.5s ease, opacity 0.3s' }} className="group-hover:scale-105 group-hover:opacity-60" />
-                    )}
-                    <div style={{ position: 'relative', zIndex: 1, padding: '32px', background: 'linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.3) 60%, transparent 100%)', width: '100%' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-                        {heroMain.categories && (
-                          <span style={{ background: '#ff5722', color: 'white', fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 100 }}>
-                            {heroMain.categories.name}
-                          </span>
-                        )}
-                        <span style={{ fontSize: 12, color: '#d1d5db' }}>⏱️ {readingTime(heroMain.content)} min de leitura</span>
-                      </div>
-                      <h1 style={{ fontSize: 'clamp(20px, 3vw, 34px)', fontWeight: 800, color: 'white', lineHeight: 1.25, marginBottom: 10, transition: 'color 0.2s' }} className="group-hover:text-orange-300">
-                        {heroMain.title}
-                      </h1>
-                      {heroMain.excerpt && (
-                        <p style={{ color: '#d1d5db', fontSize: 15, lineHeight: 1.6, maxWidth: 560, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                          {heroMain.excerpt}
-                        </p>
+                {/* Destaque principal */}
+                <Link
+                  href={`/post/${heroMain.slug}`}
+                  className="lg:col-span-8 relative glass-panel hud-corners rounded-2xl p-6 md:p-8 flex flex-col justify-between overflow-hidden group hover:border-cyber-cyan/50 transition-all duration-500 shadow-petroleum-glow hover:shadow-neon-glow"
+                >
+                  <div className="relative z-10">
+                    <div className="flex items-center gap-3 mb-4 flex-wrap">
+                      {heroMain.categories && (
+                        <span className="bg-petroleum-500/20 text-cyber-cyan border border-cyber-cyan/40 px-3 py-1 rounded text-[11px] font-orbitron font-semibold tracking-wider">
+                          {heroMain.categories.name.toUpperCase()}
+                        </span>
                       )}
+                      <span className="text-xs text-petroleum-400 font-orbitron">{heroDate}</span>
                     </div>
+                    <h1 className="text-2xl md:text-4xl font-orbitron font-black tracking-tight leading-tight mb-4 text-transparent bg-clip-text bg-gradient-to-r from-white via-cyan-100 to-petroleum-300">
+                      {heroMain.title}
+                    </h1>
+                    {heroMain.excerpt && (
+                      <p className="text-gray-300 text-sm md:text-base leading-relaxed max-w-2xl font-space">
+                        {heroMain.excerpt}
+                      </p>
+                    )}
                   </div>
+
+                  <div className="relative z-10 flex items-center justify-end pt-6 mt-6 border-t border-cyber-border">
+                    <span className="px-6 py-3 rounded-md bg-gradient-to-r from-petroleum-600 to-petroleum-500 group-hover:from-cyber-cyan group-hover:to-petroleum-500 group-hover:text-cyber-dark font-orbitron text-xs font-bold tracking-widest transition-all duration-300">
+                      LER REVIEW COMPLETO →
+                    </span>
+                  </div>
+
+                  {heroMain.cover_image && (
+                    <img
+                      src={heroMain.cover_image}
+                      alt=""
+                      className="absolute inset-0 w-full h-full object-cover opacity-15 -z-0 group-hover:opacity-20 transition-opacity duration-500"
+                    />
+                  )}
                 </Link>
 
-                {/* 2 posts lado direito */}
-                {heroSide.length > 0 && (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-                    {heroSide.map(post => (
-                      <Link key={post.id} href={`/post/${post.slug}`} style={{ textDecoration: 'none', color: 'inherit', flex: 1, display: 'block' }}>
-                        <div style={{ position: 'relative', borderRadius: 16, overflow: 'hidden', background: '#111827', height: '100%', minHeight: 180, display: 'flex', alignItems: 'flex-end', cursor: 'pointer' }} className="group">
-                          {post.cover_image && (
-                            <img src={post.cover_image} alt={post.title} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: 0.5, transition: 'transform 0.4s' }} className="group-hover:scale-105" />
-                          )}
-                          <div style={{ position: 'relative', zIndex: 1, padding: '20px', background: 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 100%)', width: '100%' }}>
-                            {post.categories && (
-                              <span style={{ background: '#ff5722', color: 'white', fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 100, display: 'inline-block', marginBottom: 8 }}>
-                                {post.categories.name}
-                              </span>
-                            )}
-                            <h2 style={{ fontSize: 15, fontWeight: 700, color: 'white', lineHeight: 1.35, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', transition: 'color 0.2s' }} className="group-hover:text-orange-300">
-                              {post.title}
-                            </h2>
-                          </div>
-                        </div>
-                      </Link>
-                    ))}
+                {/* Feed lateral */}
+                <div className="lg:col-span-4 glass-panel rounded-2xl p-6 flex flex-col">
+                  <h2 className="font-orbitron font-bold text-sm tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-cyber-cyan to-white mb-2">
+                    ⚡ ÚLTIMAS ATUALIZAÇÕES
+                  </h2>
+                  <div className="flex-1">
+                    {heroSide.length > 0 ? (
+                      heroSide.map((post, i) => <SideNewsItem key={post.id} post={post} index={i} />)
+                    ) : (
+                      <p className="text-xs text-gray-500 font-space py-4">Mais conteúdos chegando em breve.</p>
+                    )}
                   </div>
-                )}
+                </div>
               </div>
             </section>
           ) : (
-            <section style={{ textAlign: 'center', padding: '80px 20px', marginBottom: 40 }}>
-              <div style={{ fontSize: 56, marginBottom: 16 }}>🖥️</div>
-              <h2 style={{ fontSize: 22, fontWeight: 700, marginBottom: 10 }}>Nenhum post publicado ainda</h2>
-              <p style={{ color: '#6b7280' }}>Em breve, novos conteúdos por aqui.</p>
+            <section className="text-center py-20">
+              <div className="text-5xl mb-4 opacity-40">🖥️</div>
+              <h2 className="font-orbitron text-xl font-bold mb-2 text-white">Nenhum post publicado ainda</h2>
+              <p className="text-gray-500 font-space">Em breve, novos conteúdos por aqui.</p>
             </section>
           )}
 
-          {/* ===== CATEGORIAS PILLS ===== */}
+          {/* ===== CATEGORIAS ===== */}
           {categories && categories.length > 0 && (
-            <section style={{ marginBottom: 48 }}>
-              <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 4 }}>
-                {categories.map(cat => (
-                  <Link key={cat.slug} href={`/categoria/${cat.slug}`}
-                    style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 16px', borderRadius: 100, border: '1px solid #e5e7eb', textDecoration: 'none', color: 'inherit', fontWeight: 500, fontSize: 13, whiteSpace: 'nowrap', transition: 'all 0.15s', background: 'white' }}
-                    className="hover:border-orange-500 hover:text-orange-600 hover:bg-orange-50 dark:bg-gray-900 dark:border-gray-700 dark:hover:border-orange-500 dark:hover:text-orange-400 dark:hover:bg-orange-950">
+            <section className="mb-14">
+              <div className="flex gap-2 overflow-x-auto pb-1 font-orbitron text-[11px]">
+                {categories.map((cat) => (
+                  <Link
+                    key={cat.slug}
+                    href={`/categoria/${cat.slug}`}
+                    className="flex items-center gap-2 px-4 py-2 rounded-full border border-cyber-border text-gray-300 whitespace-nowrap hover:border-cyber-cyan hover:text-cyber-cyan transition"
+                  >
                     <span>{cat.icon}</span>
-                    <span>{cat.name}</span>
+                    <span>{cat.name.toUpperCase()}</span>
                   </Link>
                 ))}
               </div>
             </section>
           )}
 
-          {/* ===== CONTEÚDO PRINCIPAL + SIDEBAR ===== */}
+          {/* ===== CONTEÚDO + SIDEBAR ===== */}
           {hasContent && (
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 48, alignItems: 'start' }} className="lg:grid-cols-[1fr_300px]">
+            <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-12 items-start">
 
-              {/* COLUNA PRINCIPAL */}
+              {/* Coluna principal */}
               <div>
-                {/* Seções por categoria */}
                 {Object.keys(postsByCategory).length > 0 ? (
                   Object.values(postsByCategory).map(({ cat, posts: catPosts }) => (
-                    <section key={cat.slug} style={{ marginBottom: 52 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20, paddingBottom: 12, borderBottom: '2px solid #ff5722' }}>
-                        <h2 style={{ fontSize: 18, fontWeight: 800, display: 'flex', alignItems: 'center', gap: 8 }}>
-                          <span>{categories?.find(c => c.slug === cat.slug)?.icon}</span>
-                          <span>{cat.name}</span>
+                    <section key={cat.slug} id={cat.slug} className="mb-14">
+                      <div className="flex items-center justify-between mb-6 pb-3 border-b border-cyber-border">
+                        <h2 className="font-orbitron font-black text-lg md:text-xl tracking-wide text-white flex items-center gap-2">
+                          <span>{categories?.find((c) => c.slug === cat.slug)?.icon}</span>
+                          <span>{cat.name.toUpperCase()}</span>
                         </h2>
-                        <Link href={`/categoria/${cat.slug}`} style={{ fontSize: 13, color: '#ff5722', fontWeight: 600, textDecoration: 'none' }} className="hover:underline">
-                          Ver todos →
+                        <Link href={`/categoria/${cat.slug}`} className="text-xs font-orbitron font-bold text-cyber-cyan hover:text-white transition">
+                          VER TODOS →
                         </Link>
                       </div>
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 20 }}>
-                        {catPosts.slice(0, 3).map(post => <CardLarge key={post.id} post={post} />)}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        {catPosts.slice(0, 4).map((post) => (
+                          <PostCard key={post.id} post={post} />
+                        ))}
                       </div>
                     </section>
                   ))
                 ) : restPosts.length > 0 ? (
-                  <section style={{ marginBottom: 52 }}>
-                    <h2 style={{ fontSize: 18, fontWeight: 800, marginBottom: 20, paddingBottom: 12, borderBottom: '2px solid #ff5722' }}>Publicações recentes</h2>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 20 }}>
-                      {restPosts.slice(0, 6).map(post => <CardLarge key={post.id} post={post} />)}
+                  <section className="mb-14">
+                    <h2 className="font-orbitron font-black text-lg mb-6 pb-3 border-b border-cyber-border text-white">
+                      PUBLICAÇÕES RECENTES
+                    </h2>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                      {restPosts.slice(0, 6).map((post) => (
+                        <PostCard key={post.id} post={post} />
+                      ))}
                     </div>
                   </section>
                 ) : null}
               </div>
 
-              {/* SIDEBAR */}
-              <aside style={{ position: 'sticky', top: 88 }}>
+              {/* Sidebar */}
+              <aside className="sticky top-28 space-y-6">
 
-                {/* Mais lidos */}
                 {popular && popular.length > 0 && (
-                  <div style={{ borderRadius: 16, border: '1px solid #e5e7eb', background: 'white', padding: '20px', marginBottom: 24 }} className="dark:bg-gray-900 dark:border-gray-800">
-                    <h3 style={{ fontSize: 15, fontWeight: 800, marginBottom: 4, paddingBottom: 12, borderBottom: '2px solid #ff5722', display: 'inline-block' }}>
-                      🔥 Mais lidos
+                  <div className="glass-panel rounded-xl p-5">
+                    <h3 className="font-orbitron font-bold text-sm text-cyber-cyan mb-3 pb-3 border-b border-cyber-border">
+                      🔥 MAIS LIDOS
                     </h3>
-                    <div style={{ marginTop: 12 }}>
-                      {popular.map((post, i) => (
-                        <Link key={post.id} href={`/post/${post.slug}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                          <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start', padding: '10px 0', borderBottom: '1px solid #f3f4f6', cursor: 'pointer' }} className="group dark:border-gray-800">
-                            <span style={{ fontSize: 22, fontWeight: 900, color: i === 0 ? '#ff5722' : '#e5e7eb', minWidth: 28, lineHeight: 1 }} className="dark:text-gray-700">
-                              {String(i + 1).padStart(2, '0')}
-                            </span>
-                            <p style={{ fontSize: 13, fontWeight: 600, lineHeight: 1.4, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', transition: 'color 0.2s' }} className="group-hover:text-orange-500">
-                              {post.title}
-                            </p>
-                          </div>
-                        </Link>
-                      ))}
-                    </div>
+                    {popular.map((post, i) => (
+                      <Link key={post.id} href={`/post/${post.slug}`} className="group block">
+                        <div className="flex gap-3 items-start py-2.5 border-b border-cyber-border last:border-b-0">
+                          <span className="font-orbitron font-black text-lg min-w-[26px] leading-none" style={{ color: i === 0 ? '#00f0ff' : '#334155' }}>
+                            {String(i + 1).padStart(2, '0')}
+                          </span>
+                          <p className="text-xs font-semibold text-gray-300 leading-snug line-clamp-2 group-hover:text-cyber-cyan transition font-space">
+                            {post.title}
+                          </p>
+                        </div>
+                      </Link>
+                    ))}
                   </div>
                 )}
 
-                {/* Newsletter */}
-                <div style={{ borderRadius: 16, background: 'linear-gradient(135deg, #ff5722 0%, #e64a19 100%)', padding: '24px', color: 'white' }}>
-                  <div style={{ fontSize: 28, marginBottom: 10 }}>📬</div>
-                  <h3 style={{ fontSize: 16, fontWeight: 800, marginBottom: 6 }}>Fique por dentro</h3>
-                  <p style={{ fontSize: 13, opacity: 0.9, lineHeight: 1.5, marginBottom: 16 }}>
-                    Receba os melhores reviews e dicas de setup direto no seu e-mail.
+                <div className="glass-panel rounded-xl p-6 border-petroleum-500/30">
+                  <div className="text-2xl mb-2">📬</div>
+                  <h3 className="font-orbitron font-bold text-sm text-white mb-2">FIQUE POR DENTRO</h3>
+                  <p className="text-xs text-gray-400 leading-relaxed mb-4 font-space">
+                    Receba os melhores reviews e achados de custo-benefício direto no seu e-mail.
                   </p>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  <form className="flex flex-col gap-2">
                     <input
                       type="email"
                       placeholder="seu@email.com"
-                      style={{ width: '100%', padding: '10px 14px', borderRadius: 10, border: 'none', fontSize: 14, color: '#111827', outline: 'none' }}
+                      className="w-full bg-cyber-dark border border-cyber-border focus:border-cyber-cyan outline-none rounded-md px-3 py-2.5 text-sm text-gray-200 placeholder-gray-500"
                     />
-                    <button style={{ width: '100%', padding: '10px 14px', borderRadius: 10, background: 'white', color: '#ff5722', fontWeight: 700, fontSize: 14, border: 'none', cursor: 'pointer', transition: 'opacity 0.2s' }} className="hover:opacity-90">
-                      Quero receber →
+                    <button
+                      type="submit"
+                      className="w-full py-2.5 rounded-md bg-gradient-to-r from-petroleum-600 to-petroleum-500 hover:from-cyber-cyan hover:to-petroleum-500 hover:text-cyber-dark text-white font-orbitron text-xs font-bold tracking-wide transition"
+                    >
+                      QUERO RECEBER →
                     </button>
-                  </div>
-                  <p style={{ fontSize: 11, opacity: 0.75, marginTop: 10 }}>Sem spam. Cancele quando quiser.</p>
+                  </form>
+                  <p className="text-[11px] text-gray-500 mt-3 font-space">Sem spam. Cancele quando quiser.</p>
                 </div>
               </aside>
             </div>
           )}
-
         </div>
       </main>
       <Footer />
