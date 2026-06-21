@@ -198,12 +198,12 @@ export default function PcbBackground() {
     function onClick(e: MouseEvent) {
       if (!prefersReduced) triggerFrom(e.clientX, e.clientY)
     }
-    canvas.addEventListener('click', onClick)
+    window.addEventListener('click', onClick)
 
     return () => {
       window.removeEventListener('resize', resize)
       document.removeEventListener('visibilitychange', onVisibility)
-      canvas.removeEventListener('click', onClick)
+      window.removeEventListener('click', onClick)
       running = false
       if (raf) cancelAnimationFrame(raf)
     }
@@ -212,7 +212,7 @@ export default function PcbBackground() {
   return (
     <canvas
       ref={canvasRef}
-      className="fixed top-0 left-0 w-full h-full -z-10 opacity-70 pointer-events-auto"
+      className="fixed top-0 left-0 w-full h-full -z-10 opacity-70 pointer-events-none"
       aria-hidden="true"
     />
   )

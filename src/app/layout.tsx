@@ -20,7 +20,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="min-h-screen flex flex-col relative text-gray-100">
         <PcbBackground />
-        <div className="fixed top-0 left-0 w-full h-full -z-10 bg-gradient-to-t from-cyber-dark via-transparent to-cyber-dark/80 pointer-events-none" />
+        <div className="fixed top-0 left-0 w-full h-full -z-20 bg-gradient-to-t from-cyber-dark via-transparent to-cyber-dark/80 pointer-events-none" />
         {children}
       </body>
     </html>
