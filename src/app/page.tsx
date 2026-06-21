@@ -120,24 +120,6 @@ export default async function HomePage() {
             </section>
           )}
 
-          {/* ===== CATEGORIAS ===== */}
-          {categories && categories.length > 0 && (
-            <section className="mb-14">
-              <div className="flex gap-2 overflow-x-auto pb-1 font-orbitron text-[11px]">
-                {categories.map((cat) => (
-                  <Link
-                    key={cat.slug}
-                    href={`/categoria/${cat.slug}`}
-                    className="flex items-center gap-2 px-4 py-2 rounded-full border border-cyber-border text-gray-300 whitespace-nowrap hover:border-cyber-cyan hover:text-cyber-cyan transition"
-                  >
-                    <span>{cat.icon}</span>
-                    <span>{cat.name.toUpperCase()}</span>
-                  </Link>
-                ))}
-              </div>
-            </section>
-          )}
-
           {/* ===== CONTEÚDO + SIDEBAR ===== */}
           {hasContent && (
             <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-12 items-start">

@@ -1,20 +1,11 @@
 import Link from 'next/link'
 
-const categories = [
-  { name: 'Monitores', slug: 'monitores' },
-  { name: 'Teclados', slug: 'teclados' },
-  { name: 'Mouses', slug: 'mouses' },
-  { name: 'Cadeiras', slug: 'cadeiras' },
-  { name: 'Headsets', slug: 'headsets' },
-  { name: 'Notebooks', slug: 'notebooks' },
-]
-
 export default function Footer() {
   return (
     <footer className="relative border-t border-cyber-border bg-cyber-card mt-16">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
 
-        <div className="grid gap-10 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 mb-12">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-10 mb-10">
 
           {/* Marca */}
           <div>
@@ -22,7 +13,7 @@ export default function Footer() {
               <img src="/brand/logo-mark.png" alt="SetupBrasil" className="w-11 h-11" />
               <span className="font-orbitron font-black text-base text-white">SETUP BRASIL</span>
             </Link>
-            <p className="text-xs leading-relaxed text-gray-500 max-w-[220px] font-space">
+            <p className="text-xs leading-relaxed text-gray-500 max-w-[260px] font-space">
               Reviews honestos e comparativos de custo-benefício pra você montar um setup bom sem gastar mal.
             </p>
             <div className="flex gap-2 mt-5">
@@ -35,20 +26,6 @@ export default function Footer() {
                 ▶️
               </a>
             </div>
-          </div>
-
-          {/* Categorias */}
-          <div>
-            <h4 className="font-orbitron text-xs font-bold text-white mb-4 uppercase tracking-widest">Categorias</h4>
-            <ul className="space-y-2.5">
-              {categories.map((cat) => (
-                <li key={cat.slug}>
-                  <Link href={`/categoria/${cat.slug}`} className="text-xs text-gray-500 hover:text-cyber-cyan transition font-space">
-                    {cat.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
           </div>
 
           {/* Institucional */}
@@ -68,25 +45,6 @@ export default function Footer() {
                 </li>
               ))}
             </ul>
-          </div>
-
-          {/* Newsletter mini */}
-          <div>
-            <h4 className="font-orbitron text-xs font-bold text-white mb-4 uppercase tracking-widest">Newsletter</h4>
-            <p className="text-xs text-gray-500 leading-relaxed mb-4 font-space">Receba os melhores achados toda semana.</p>
-            <form className="flex gap-2">
-              <input
-                type="email"
-                placeholder="seu@email.com"
-                className="flex-1 min-w-0 bg-cyber-dark border border-cyber-border focus:border-cyber-cyan outline-none rounded-md px-3 py-2 text-xs text-gray-200 placeholder-gray-500"
-              />
-              <button
-                type="submit"
-                className="px-3 py-2 rounded-md bg-gradient-to-r from-petroleum-600 to-petroleum-500 hover:from-cyber-cyan hover:to-petroleum-500 hover:text-cyber-dark text-white font-orbitron text-xs font-bold transition"
-              >
-                →
-              </button>
-            </form>
           </div>
         </div>
 
