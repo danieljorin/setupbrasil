@@ -3,9 +3,9 @@ import Link from 'next/link'
 export default function Footer() {
   return (
     <footer className="relative border-t border-cyber-border bg-cyber-card mt-16">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
 
-        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-10 mb-10">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 mb-8">
 
           {/* Marca */}
           <div>
@@ -13,10 +13,7 @@ export default function Footer() {
               <img src="/brand/logo-mark.png" alt="SetupBrasil" className="w-11 h-11" />
               <span className="font-orbitron font-black text-base text-white">SETUP BRASIL</span>
             </Link>
-            <p className="text-xs leading-relaxed text-gray-500 max-w-[260px] font-space">
-              Reviews honestos e comparativos de custo-benefício pra você montar um setup bom sem gastar mal.
-            </p>
-            <div className="flex gap-2 mt-5">
+            <div className="flex gap-2">
               <a href="https://instagram.com/setupbrasil" target="_blank" rel="noopener noreferrer"
                 className="w-9 h-9 rounded-md border border-cyber-border flex items-center justify-center text-sm hover:border-cyber-cyan hover:text-cyber-cyan transition">
                 📸
@@ -31,7 +28,7 @@ export default function Footer() {
           {/* Institucional */}
           <div>
             <h4 className="font-orbitron text-xs font-bold text-white mb-4 uppercase tracking-widest">Institucional</h4>
-            <ul className="space-y-2.5">
+            <ul className="flex flex-wrap gap-x-6 gap-y-2">
               {[
                 { label: 'Sobre Nós', href: '/sobre' },
                 { label: 'Contato', href: '/contato' },
@@ -39,7 +36,7 @@ export default function Footer() {
                 { label: 'Termos de Uso', href: '/termos' },
               ].map((item) => (
                 <li key={item.href}>
-                  <Link href={item.href} className="text-xs text-gray-500 hover:text-cyber-cyan transition font-space">
+                  <Link href={item.href} className="text-xs text-gray-500 hover:text-cyber-cyan transition font-space whitespace-nowrap">
                     {item.label}
                   </Link>
                 </li>
